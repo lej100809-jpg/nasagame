@@ -187,6 +187,7 @@
     "status": "game_defined"
   },
   "sampling": {
+    "max_attempts": 2,
     "base_success": 0.68,
     "bonus": { "ocams": 0.12, "ola": 0.10 },
     "sample_mass_g_range": [60, 260],

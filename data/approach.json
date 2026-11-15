@@ -1,0 +1,72 @@
+{
+  "status": "game_defined",
+  "note": "Authored controls, camera-relative distances and propellant economy for manual TAG. The allocated trim is included in the existing proximity burn. Additional trim may only draw from surplus above the return reserve. AI-assisted (OpenAI Codex).",
+  "motion": {
+    "startAltitude": 23,
+    "retryAltitude": 15,
+    "retryOffsetScale": 0.72,
+    "maxFrameSeconds": 0.125,
+    "timeLimitSeconds": 56,
+    "boundary": 16,
+    "maxLateralSpeed": 2.8,
+    "thrusterResponse": 2.6,
+    "coastResponse": 1.7,
+    "brakeResponse": 6.5,
+    "brakeFuelFactor": 0.35,
+    "descentSpeed": 1.75,
+    "flareAltitude": 5.75,
+    "flareSpeed": 0.47
+  },
+  "contact": {
+    "targetX": 0,
+    "targetY": 0,
+    "minAltitude": 0.55,
+    "maxAltitude": 2.55,
+    "radius": 2.5,
+    "maxLateralSpeed": 1.1,
+    "precisionRadius": 0.9,
+    "precisionSpeed": 0.45,
+    "precisionBonus": 0.15,
+    "contactBonus": 0.06
+  },
+  "modes": {
+    "standard": {
+      "startX": 4.8,
+      "startY": -3.7,
+      "allocatedFuelKg": 0.52,
+      "extraFuelLimitKg": 0.8,
+      "fuelRateKgPerSecond": 0.09
+    },
+    "lean_budget": {
+      "startX": 4.5,
+      "startY": -3.4,
+      "allocatedFuelKg": 0.38,
+      "extraFuelLimitKg": 0.3,
+      "fuelRateKgPerSecond": 0.1
+    },
+    "solar_max": {
+      "startX": 4.2,
+      "startY": -3.9,
+      "gate": {
+        "stage": "lock",
+        "holdAltitude": 9,
+        "radius": 3,
+        "maxLateralSpeed": 1.25,
+        "signalPeriodSeconds": 7,
+        "signalOutageSeconds": 2.6
+      }
+    },
+    "fixed_window": {
+      "startX": 5.2,
+      "startY": -4.1,
+      "gate": {
+        "stage": "checkpoint",
+        "targetX": 2.8,
+        "targetY": -2.2,
+        "holdAltitude": 10,
+        "radius": 1.45,
+        "maxLateralSpeed": 0.9
+      }
+    }
+  }
+}
