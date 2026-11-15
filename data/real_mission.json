@@ -1,0 +1,85 @@
+{
+  "mission": "OSIRIS-REx",
+  "target": "101955 Bennu",
+  "launch": {
+    "date": "2016-09-08",
+    "vehicle": "Atlas V 411",
+    "source": "https://science.nasa.gov/mission/osiris-rex/",
+    "c3_km2_s2": 29.29678,
+    "c3_source": "https://arxiv.org/pdf/1702.06981"
+  },
+  "arrival_at_bennu": {
+    "date": "2018-12-03",
+    "source": "https://science.nasa.gov/mission/osiris-rex/"
+  },
+  "sample_collection_TAG": {
+    "date": "2020-10-20",
+    "source": "https://science.nasa.gov/mission/osiris-rex/"
+  },
+  "sample_capsule_landing": {
+    "date": "2023-09-24",
+    "source": "https://science.nasa.gov/mission/osiris-rex/"
+  },
+  "sample_goal_g": {
+    "value": 60,
+    "source": "https://science.nasa.gov/mission/osiris-rex/in-depth"
+  },
+  "sample_returned_g": {
+    "value": 121.6,
+    "source": "https://en.wikipedia.org/wiki/OSIRIS-REx"
+  },
+  "launch_mass_kg": {
+    "value": 2110,
+    "source": "https://en.wikipedia.org/wiki/OSIRIS-REx"
+  },
+  "dry_mass_kg": {
+    "value": 880,
+    "source": "https://en.wikipedia.org/wiki/OSIRIS-REx"
+  },
+  "propellant_and_helium_kg": {
+    "value": 1230,
+    "source": "https://en.wikipedia.org/wiki/OSIRIS-REx"
+  },
+  "power_w": {
+    "min": 1226,
+    "max": 3000,
+    "source": "https://en.wikipedia.org/wiki/OSIRIS-REx",
+    "note": "NASA press kit says 1,226 to 3,000 W; Lauretta et al. 2017 says 1,226 to 2,500 W."
+  },
+  "cost_musd": {
+    "mission_excluding_launch": 800,
+    "launch": 183.5,
+    "note": "approximate",
+    "source": "https://en.wikipedia.org/wiki/OSIRIS-REx"
+  },
+  "instruments": [
+    "OCAMS (camera suite)",
+    "OLA (laser altimeter)",
+    "OVIRS (visible and infrared spectrometer)",
+    "OTES (thermal emission spectrometer)",
+    "REXIS (X-ray imaging spectrometer)",
+    "TAGSAM (sample acquisition mechanism)"
+  ],
+  "instruments_source": "https://science.nasa.gov/mission/osiris-rex/in-depth",
+  "objectives": [
+    "Return and analyze a pristine carbon-rich asteroid sample (at least 60 g)",
+    "Map global properties for comparison with ground-based telescope data",
+    "Map chemistry and mineralogy",
+    "Measure the Yarkovsky effect",
+    "Document the regolith at the sampling site"
+  ],
+  "bennu_orbit": {
+    "semi_major_axis_au": 1.1264,
+    "perihelion_au": 0.8969,
+    "aphelion_au": 1.3559,
+    "mean_diameter_m": 490,
+    "source": "https://en.wikipedia.org/wiki/101955_Bennu"
+  },
+  "notes": [
+    "Wikipedia values should be double-checked against NASA sources before submission if possible."
+  ],
+  "sample_return_capsule_kg": {
+    "value": 46,
+    "source": "https://www.nasa.gov/wp-content/uploads/2016/06/osiris-rex_press_kit_0.pdf"
+  }
+}

@@ -1,0 +1,42 @@
+{
+  "notes": [
+    "Capacity depends on launch energy C3. Only Atlas V 411 has a verified real data point here (what it actually launched for OSIRIS-REx).",
+    "For more points, use NASA Launch Services Program Launch Vehicle Performance Website: https://elvperf.ksc.nasa.gov/ (Performance Query).",
+    "cost_musd for Falcon 9 and Falcon Heavy are NASA's total launch costs for specific missions, which include other mission related costs."
+  ],
+  "vehicles": [
+    {
+      "id": "atlas_v_411",
+      "name": "Atlas V 411",
+      "cost_musd": 183.5,
+      "cost_source": "https://en.wikipedia.org/wiki/OSIRIS-REx",
+      "capacity_points": [
+        {
+          "c3_km2_s2": 29.3,
+          "mass_kg": 2105,
+          "status": "verified",
+          "note": "Actually launched OSIRIS-REx (2,105 kg) at C3 29.29678 km2/s2. This is a lower bound of capacity, not the maximum.",
+          "source": "https://arxiv.org/pdf/1702.06981"
+        }
+      ]
+    },
+    {
+      "id": "falcon_9",
+      "name": "Falcon 9",
+      "cost_musd": 69,
+      "cost_source": "https://www.nasa.gov/press-release/nasa-awards-launch-services-contract-for-asteroid-redirect-test-mission",
+      "cost_note": "NASA total launch cost for DART (2019 award)",
+      "capacity_points": [],
+      "status": "needs_source"
+    },
+    {
+      "id": "falcon_heavy",
+      "name": "Falcon Heavy",
+      "cost_musd": 117,
+      "cost_source": "https://www.nasa.gov/news-release/nasa-awards-launch-services-contract-for-the-psyche-mission",
+      "cost_note": "NASA total launch cost for Psyche and secondary payloads (2020 award)",
+      "capacity_points": [],
+      "status": "needs_source"
+    }
+  ]
+}
