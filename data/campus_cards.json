@@ -1,0 +1,84 @@
+{
+  "_note": "AI-assisted bilingual paraphrases of NASA mission records (OpenAI Codex). Campus placements are fictional.",
+  "display": {
+    "width_m": 0.72,
+    "height_m": 0.46,
+    "reach_m": 1.8,
+    "status": "game_defined"
+  },
+  "placement_status": "game_defined",
+  "cards": [
+    {
+      "id": "card_launch",
+      "position_m": [12, 1.62, -327.45],
+      "location": { "en": "Launch pad viewing deck", "ko": "발사대 전망 데크" },
+      "title": { "en": "Liftoff from SLC-41", "ko": "SLC-41에서 이륙" },
+      "fact": {
+        "en": "An Atlas V launched OSIRIS-REx from Cape Canaveral’s SLC-41 on September 8, 2016. The spacecraft deployed its solar arrays after separating from the Centaur upper stage.",
+        "ko": "2016년 9월 8일, 아틀라스 V가 케이프커내버럴 SLC-41에서 OSIRIS-REx를 쏘아 올렸습니다. 우주선은 센타우르 상단과 분리된 뒤 태양전지판을 펼쳤습니다."
+      },
+      "source": "https://science.nasa.gov/mission/osiris-rex/in-depth/",
+      "status": "verified"
+    },
+    {
+      "id": "card_flyby",
+      "position_m": [-29.54, 1.55, -15],
+      "location": { "en": "Mission Control’s west wall", "ko": "임무 관제센터 서쪽 벽" },
+      "title": { "en": "Earth gravity assist", "ko": "지구 중력 도움" },
+      "fact": {
+        "en": "On September 22, 2017, OSIRIS-REx flew past Earth. Earth’s gravity tilted the spacecraft’s orbit to line it up with Bennu’s orbit.",
+        "ko": "2017년 9월 22일, OSIRIS-REx가 지구 곁을 지나갔습니다. 지구의 중력이 우주선의 궤도면을 기울여 베누의 궤도면에 맞췄습니다."
+      },
+      "source": "https://science.nasa.gov/mission/osiris-rex/in-depth/",
+      "status": "verified"
+    },
+    {
+      "id": "card_particles",
+      "position_m": [-2.14, 1.49, -52],
+      "location": { "en": "Rocket Garden, behind the rocket equation exhibit", "ko": "로켓 가든 로켓 방정식 안내판 뒤" },
+      "title": { "en": "An active asteroid", "ko": "자갈을 내뿜는 베누" },
+      "fact": {
+        "en": "OSIRIS-REx spotted pebbles lifting off Bennu. Some briefly orbited the asteroid, letting researchers measure subtle differences in its gravity.",
+        "ko": "OSIRIS-REx는 베누 표면에서 자갈이 튀어 오르는 모습을 포착했습니다. 일부는 잠시 베누를 공전했고, 덕분에 연구진은 중력의 미세한 차이를 측정할 수 있었습니다."
+      },
+      "source": "https://www.nasa.gov/solar-system/why-is-asteroid-bennu-ejecting-particles-into-space/",
+      "status": "verified"
+    },
+    {
+      "id": "card_nightingale",
+      "position_m": [10.14, 1.49, -148],
+      "location": { "en": "Rocket Garden, behind the propellants exhibit", "ko": "로켓 가든 추진제 안내판 뒤" },
+      "title": { "en": "The Nightingale approach", "ko": "나이팅게일 접근" },
+      "fact": {
+        "en": "Bennu’s boulders left a sampling area about the size of a small parking lot. The Matchpoint burn slowed OSIRIS-REx and matched the asteroid’s rotation for contact.",
+        "ko": "바위가 빽빽한 베누에서 샘플을 채취할 수 있는 공간은 작은 주차장만 했습니다. OSIRIS-REx는 매치포인트 연소로 하강 속도를 줄이고, 접촉할 때 베누의 자전에 움직임을 맞췄습니다."
+      },
+      "source": "https://www.nasa.gov/news-release/nasas-osiris-rex-spacecraft-successfully-touches-asteroid/",
+      "status": "verified"
+    },
+    {
+      "id": "card_nitrogen",
+      "position_m": [40.8, 1.5, -15.6],
+      "location": { "en": "Clean room’s east wall near the entrance", "ko": "클린룸 입구 안쪽 동쪽 벽" },
+      "title": { "en": "Sampling with nitrogen", "ko": "질소로 채취한 샘플" },
+      "fact": {
+        "en": "TAGSAM fired a burst of pressurized nitrogen into Bennu. It sent dust and small stones into the collector as the arm sank nearly half a meter into the loosely packed surface.",
+        "ko": "TAGSAM은 베누 표면에 고압 질소를 분사해 먼지와 작은 돌을 채취 헤드에 모았습니다. 그사이 채취 팔은 느슨한 표면 아래로 거의 0.5 m나 들어갔습니다."
+      },
+      "source": "https://svs.gsfc.nasa.gov/20360/",
+      "status": "verified"
+    },
+    {
+      "id": "card_return",
+      "position_m": [12, 1.1, 4.32],
+      "location": { "en": "Main plaza wayfinding sign", "ko": "중앙 광장 방향 안내 표지" },
+      "title": { "en": "121.6 grams from Bennu", "ko": "베누에서 가져온 121.6 g" },
+      "fact": {
+        "en": "The return capsule landed in Utah on September 24, 2023. NASA recovered 121.6 g of bulk asteroid material, more than twice the mission’s 60 g goal.",
+        "ko": "귀환 캡슐은 2023년 9월 24일 미국 유타주에 착륙했습니다. NASA가 회수한 베누 샘플은 121.6 g으로, 임무 목표였던 60 g의 두 배를 넘었습니다."
+      },
+      "source": "https://science.nasa.gov/mission/osiris-rex/",
+      "status": "verified"
+    }
+  ]
+}

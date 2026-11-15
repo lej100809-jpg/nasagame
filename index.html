@@ -6,8 +6,8 @@
   <title>COSMO CRAFT — Design Your Own Asteroid Mission</title>
   <meta name="description" content="Design an OSIRIS-REx-class asteroid sample return mission within real mass, power, budget and orbital constraints, fly it through real NASA DONKI space weather, and compare with the real mission. NASA Space Apps Challenge 2026." />
   <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-  <script type="module" crossorigin src="./assets/index-Cht8KrWu.js"></script>
-  <link rel="stylesheet" crossorigin href="./assets/index-DARPXy3J.css">
+  <script type="module" crossorigin src="./assets/index-hD44s5hu.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BKcJoniS.css">
 </head>
 <body>
   <canvas id="gl"></canvas>
@@ -23,6 +23,7 @@
     <div class="logo brand" data-go="briefing"><svg class="emblem" viewBox="0 0 64 64" aria-hidden="true"><path d="M48.97 15.03A24 24 0 1 0 48.97 48.97" fill="none" stroke="#39c5bb" stroke-width="7" stroke-linecap="butt"/><path d="M41.19 22.81A13 13 0 1 0 41.19 41.19" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="butt"/><circle cx="52" cy="32" r="5" fill="#ff5fa2"/><path d="M28 29.5l6 2.5-6 2.5z" fill="#ffffff"/></svg><div class="wm"><b>COSMO<em>CRAFT</em></b></div></div>
     <nav id="stepper"></nav>
     <div id="topright">
+      <button id="btn-campus" class="icon-btn txt" hidden>Campus</button>
       <button id="btn-lang" class="icon-btn txt" title="English / 한국어" aria-label="Language">한</button>
       <button id="btn-q" class="icon-btn txt" title="Graphics quality" aria-label="Graphics quality">HQ</button>
       <button id="btn-sound" class="icon-btn" title="Sound on/off" aria-label="Toggle sound">🔊</button>
@@ -52,19 +53,20 @@
   <div id="radio" class="hidden"><div class="who"></div><div class="msg"></div></div>
   <div id="hint" class="hidden"></div>
   <div id="fasttravel" class="hidden"></div>
-  <div id="start" class="hidden">
+  <div id="start" class="hidden" role="dialog" aria-modal="true" aria-labelledby="start-label">
     <div class="start-card">
       <div class="brand hero"><svg class="emblem" viewBox="0 0 64 64" aria-hidden="true"><path d="M48.97 15.03A24 24 0 1 0 48.97 48.97" fill="none" stroke="#39c5bb" stroke-width="7" stroke-linecap="butt"/><path d="M41.19 22.81A13 13 0 1 0 41.19 41.19" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="butt"/><circle cx="52" cy="32" r="5" fill="#ff5fa2"/><path d="M28 29.5l6 2.5-6 2.5z" fill="#ffffff"/></svg><div class="wm"><b>COSMO<em>CRAFT</em></b><small>DESIGN YOUR OWN ASTEROID MISSION</small></div></div>
-      <div class="start-sub">Space Launch Complex · Cape Canaveral · dusk</div>
+      <div class="start-sub" id="start-label">Bennu sample return</div>
       <p>You are the lead mission designer of an asteroid sample-return mission to <b>101955 Bennu</b>. Walk the launch campus, use the consoles, build the spacecraft and send it to Bennu.</p>
       <div class="keys"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</span><span><kbd>Shift</kbd> run</span><span><kbd>Mouse</kbd> look</span><span><kbd>E</kbd> use</span><span><kbd>1</kbd>–<kbd>6</kbd> fast travel</span><span><kbd>Esc</kbd> pause</span></div>
       <button class="btn" id="start-btn">Click to enter the campus</button>
       <button class="btn ghost" id="menu-btn">Play in menu mode (no walking)</button>
+      <div class="progress-actions" id="start-progress"></div>
     </div>
   </div>
-  <div id="promo" class="hidden"><div class="card"></div><div class="count"></div><div class="flash"></div>
+  <div id="promo" class="hidden"><div class="card"></div><div class="shot-label"></div><div class="count"></div><div class="flash"></div>
     <div class="title"><svg viewBox="0 0 64 64" class="t-emb"><path class="a1" d="M48.97 15.03A24 24 0 1 0 48.97 48.97" fill="none" stroke="#39c5bb" stroke-width="7"/><path class="a2" d="M41.19 22.81A13 13 0 1 0 41.19 41.19" fill="none" stroke="#fff" stroke-width="7"/><circle class="dot" cx="52" cy="32" r="5" fill="#ff5fa2"/><path class="tri" d="M28 29.5l6 2.5-6 2.5z" fill="#fff"/></svg><div class="t-wm">COSMO<em>CRAFT</em></div><div class="t-sub">DESIGN YOUR OWN ASTEROID MISSION</div></div>
-    <button class="skip">Skip ▶▶</button></div>
+    <button class="skip">Skip intro</button></div>
   <div id="modal" class="hidden"><div id="modal-card"></div></div>
   <div id="toast"></div>
 

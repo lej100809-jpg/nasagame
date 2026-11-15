@@ -26,7 +26,8 @@
   },
   "sample_returned_g": {
     "value": 121.6,
-    "source": "https://en.wikipedia.org/wiki/OSIRIS-REx"
+    "status": "verified",
+    "source": "https://science.nasa.gov/blogs/osiris-rex/2024/02/15/nasa-announces-osiris-rex-bulk-sample-mass/"
   },
   "launch_mass_kg": {
     "value": 2110,

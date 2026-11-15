@@ -1,0 +1,47 @@
+{
+  "campus": {
+    "status": "game_defined",
+    "bloom": { "strength": 0.29, "threshold": 1.10, "radius": 0.32 },
+    "exposure": 0.88,
+    "lighting": {
+      "sun": 1.9,
+      "hemisphere": 0.54,
+      "environment": 0.44,
+      "pavementReflection": 1.2,
+      "reflectionSources": 0.72,
+      "signs": 0.74,
+      "architecturalAccents": 0.68,
+      "controlCeiling": 0.65,
+      "controlFill": 116,
+      "controlScreenFill": 42,
+      "consoleEmissive": 1.4,
+      "cleanRoomCeiling": 0.85,
+      "cleanRoomFill": 76,
+      "plazaFill": 64,
+      "streetLightPools": 0.24,
+      "padFloodlights": 0.76
+    }
+  },
+  "radio": { "status": "game_defined", "approachMeters": 7 },
+  "intro": {
+    "status": "game_defined",
+    "sampleCardSeconds": 1.8,
+    "missionCardSeconds": 1.4,
+    "logoSeconds": 2.8,
+    "countdownFrom": 3,
+    "engineLight": { "intensity": 54, "range": 13 },
+    "shots": {
+      "engine":    { "seconds": 1.7, "fov": 46, "from": [2.6, -0.4, 4.8], "to": [1.5, -0.3, 4.1], "aim": [0.1, 0.9, 0] },
+      "fairing":   { "seconds": 1.6, "fov": 33, "from": [9, -2, 21], "to": [4, 1, 18], "aim": [0, 0.6, 0] },
+      "lightning": { "seconds": 1.5, "fov": 37, "from": [18, -15, 29], "to": [24, -9, 26], "aim": [0, -4, 0] },
+      "cleanRoom": { "seconds": 1.8, "fov": 42, "from": [4.8, 3.2, 6.2], "to": [3.7, 2.6, 5], "aim": [0, 1.1, 0] },
+      "control":   { "seconds": 1.4, "fov": 47, "from": [-3.5, -0.3, 15.2], "to": [-1.8, -0.35, 12.7], "aim": [0.3, 0, 0] },
+      "pad":       { "seconds": 3, "fov": 43, "from": [43, -8, 99], "to": [51, 1, 113], "aim": [0, 0, 0] }
+    }
+  },
+  "launch": {
+    "status": "game_defined",
+    "lightVariation": 0.05,
+    "shakeMeters": 0.13
+  }
+}

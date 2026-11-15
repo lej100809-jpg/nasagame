@@ -14,6 +14,31 @@
     "status": "derived",
     "note": "Real OSIRIS-REx: about $800M mission (excluding launch) + $183.5M Atlas V 411 launch = $983.5M (real_mission.json). Rounded up to $1,000M so the real design fits with a thin margin."
   },
+  "challenges": [
+    {
+      "id": "lean_budget",
+      "title": { "en": "Lean budget", "ko": "긴축 예산" },
+      "budget_musd": 880,
+      "status": "game_defined"
+    },
+    {
+      "id": "solar_max",
+      "title": { "en": "Solar maximum", "ko": "태양 활동 극대기" },
+      "minimum_severity": 4,
+      "storm_schedule": [
+        { "phase": "cruise", "day_frac": 0.57 },
+        { "phase": "return", "day_frac": 0.55 }
+      ],
+      "status": "game_defined"
+    },
+    {
+      "id": "fixed_window",
+      "title": { "en": "Fixed window", "ko": "고정 발사창" },
+      "option_key": "2029-03-14|2030-11-29",
+      "status": "game_defined",
+      "source": "mission_options.json (NASA/JPL trajectory selected for the challenge)"
+    }
+  ],
   "launch_vehicle_model": {
     "method": "Payload capacity vs C3 is computed with the user-supplied equations: the upper stage must raise a payload from a circular parking orbit (v_circ = sqrt(mu/r), vis-viva with a = r) to the hyperbolic departure speed v = sqrt(C3 + v_esc^2), where v_esc = sqrt(2 mu / r) (escape velocity; vis-viva with a = -mu/C3). The required delta-v is then fed into the Tsiolkovsky rocket equation for the upper stage. The only free parameter (usable upper-stage propellant left in the parking orbit) is calibrated so each curve passes through one sourced data point.",
     "vehicles": {
@@ -170,10 +195,10 @@
   },
   "objectives": {
     "sample": { "label": "Return at least 60 g of pristine carbon-rich regolith", "needs_all": ["tagsam", "src"], "primary": true },
-    "global": { "label": "Map Bennu's global properties", "needs_any": ["ocams", "ola"], "points": 250 },
-    "chem_map": { "label": "Map chemistry and mineralogy", "needs_any": ["ovirs", "otes", "rexis"], "points": 250 },
-    "yarkovsky": { "label": "Measure the Yarkovsky effect", "needs_any": ["otes"], "points": 250 },
-    "site": { "label": "Document the regolith at the sample site", "needs_any": ["ocams", "ola"], "points": 250 },
+    "global": { "label": "Mapping Bennu", "label_ko": "베누 전역 지도 제작", "needs_any": ["ocams", "ola"], "points": 250 },
+    "chem_map": { "label": "Mapping chemistry and mineralogy", "label_ko": "화학·광물 지도 제작", "needs_any": ["ovirs", "otes", "rexis"], "points": 250 },
+    "yarkovsky": { "label": "Measuring the Yarkovsky effect", "label_ko": "야르콥스키 효과 측정", "needs_any": ["otes"], "points": 250 },
+    "site": { "label": "Surveying the sample site", "label_ko": "채취 지점 정밀 조사", "needs_any": ["ocams", "ola"], "points": 250 },
     "status": "game_defined mapping (parts.json objectives)"
   },
   "score": {
