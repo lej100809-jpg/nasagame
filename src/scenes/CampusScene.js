@@ -29,7 +29,7 @@ export class CampusScene {
     this._pulse = [];
     this._spin = [];
 
-    const clear = (x, z) => (Math.abs(x) < 80 && z > -330 && z < 60) || Math.hypot(x - 4, z + 430) < 240 || (Math.abs(z + 410) < 30 && x < 10 && x > -660);
+    const clear = (x, z) => (Math.abs(x) < 150 && z > -345 && z < 60) || Math.hypot(x - 4, z + 430) < 240 || (Math.abs(z + 410) < 30 && x < 10 && x > -660);
     this.env = createEnvironment(this.scene, { clear });
     // sun shadow follows the player
     const sc = this.env.sun.shadow.camera;
@@ -175,6 +175,22 @@ export class CampusScene {
     const sun = new THREE.Mesh(new THREE.SphereGeometry(0.45, 24, 16), new THREE.MeshBasicMaterial({ color: new THREE.Color(1.8, 1.3, 0.7) })); sun.position.set(18, 3, 16); this.scene.add(sun);
     const post = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.12, 2.6, 8), steel); post.position.set(18, 1.6, 16); this.scene.add(post);
     this._spin.push({ o: ring1, s: 0.15, axis: 'z' }, { o: ring2, s: -0.1, axis: 'z' });
+    // glowing plaza inlay: orbit rings + guide lines toward Mission Control and the avenue
+    {
+      const inlay = canvasTexture(1024, 1024, (g, W, H) => {
+        g.clearRect(0, 0, W, H); g.strokeStyle = 'rgba(80,220,255,1)'; g.lineWidth = 6;
+        g.beginPath(); g.arc(W / 2, H / 2, W * 0.46, 0, 7); g.stroke();
+        g.lineWidth = 3; g.beginPath(); g.ellipse(W / 2 + 18, H / 2, W * 0.36, W * 0.3, 0.4, 0, 7); g.stroke();
+        g.beginPath(); g.arc(W / 2, H / 2, W * 0.2, 0, 7); g.stroke();
+        for (let i = 0; i < 72; i++) { const a = (i / 72) * Math.PI * 2, r1 = W * 0.43, r2 = i % 6 ? W * 0.445 : W * 0.41; g.beginPath(); g.moveTo(W / 2 + Math.cos(a) * r1, H / 2 + Math.sin(a) * r1); g.lineTo(W / 2 + Math.cos(a) * r2, H / 2 + Math.sin(a) * r2); g.stroke(); }
+        g.fillStyle = 'rgba(80,220,255,1)'; g.font = '800 64px "Segoe UI", Arial'; g.textAlign = 'center'; g.fillText('MIKU☆MIKU☆BEAM', W / 2, H / 2 + 22);
+      });
+      const disc = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), new THREE.MeshBasicMaterial({ map: inlay, transparent: true, opacity: 0.85, depthWrite: false, color: new THREE.Color(1.4, 1.4, 1.4), toneMapped: false }));
+      disc.rotation.x = -Math.PI / 2; disc.position.set(2, 0.05, 12); this.scene.add(disc);
+      const led = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.3, 1.5, 2.1), toneMapped: false });
+      const lines = [[V(-2, 0.05, 7), V(-18, 0.05, -11)], [V(4.5, 0.05, 6.4), V(4, 0.05, -8)], [V(7, 0.05, 8), V(29, 0.05, -9)]];
+      const lm = beams(lines, 0.12, led); lm.castShadow = false; lm.scale.y = 1; this.scene.add(lm);
+    }
     // wayfinding sign
     const signPost = this._box(0.25, 3.2, 0.25, std(0x2b2f36), 12, 0, 4, { col: true });
     const way = signMesh('◄ MISSION CONTROL', 3.2, 0.55, { glow: 1.2 }); way.position.set(12, 3.0, 4.2); this.scene.add(way);
