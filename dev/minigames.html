@@ -1,0 +1,17 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><title>minigames test</title>
+<style>body{margin:0;background:#05070d;color:#e6eef5;font-family:sans-serif} #bar{position:fixed;left:10px;top:10px;z-index:99;display:flex;gap:6px} #bar button{padding:6px 10px} #panelx{width:460px;margin:60px 20px;padding:20px;background:rgba(9,14,24,.9);border-radius:14px}</style></head>
+<body><div id="bar"><button id="b1">TAG</button><button id="b2">Poll</button><button id="b3">Poll scrub</button><button id="b4">Timer</button><button id="b5">Badges</button></div><div id="panelx"></div>
+<script type="module">
+import '../src/ui/style.css';
+import { tagMinigame, goNoGoPoll, alertTimer } from '../src/ui/minigames.js';
+import { evaluate, renderBadges } from '../src/game/achievements.js';
+const q = new URLSearchParams(location.search);
+const out = (x) => { document.getElementById('panelx').insertAdjacentHTML('beforeend', `<pre>${JSON.stringify(x)}</pre>`); };
+document.getElementById('b1').onclick = async () => out(await tagMinigame({ chance: 0.78 }));
+document.getElementById('b2').onclick = async () => out(await goNoGoPoll({}));
+document.getElementById('b3').onclick = async () => out(await goNoGoPoll({ items: ['Flight Dynamics', { name: 'Propulsion', go: false, reason: 'Δv 1.31 < 1.47 km/s' }, 'Power'] }));
+document.getElementById('b4').onclick = () => { const card = document.createElement('div'); card.className = 'mg-card'; card.style.cssText = 'position:fixed;left:520px;top:80px;height:140px'; card.innerHTML = '<div class="mg-k">ALERT</div><div class="mg-title">Solar flare X8.7</div>'; document.body.appendChild(card); const t = alertTimer(8, () => out('timeout')); card.appendChild(t.el); };
+const fakeMission = { result: { primary: true, ended: 'complete', secondary: { global: true, chem_map: true, yarkovsky: true, site: true } }, sampleG: 163.7, tagAttempts: 1, events: [{ choice: 'run', outcome: { hit: false } }, { choice: 'run', outcome: { hit: false } }], finalCost: () => 880, c: { budget: 1000, prop: { class: 'liquid' } }, s: { secondary: new Set(['global','chem_map','yarkovsky','site']), instruments: new Set(['ocams','ola','ovirs','otes','rexis','tagsam','src']), vehicleId: 'atlas_v_411' } };
+document.getElementById('b5').onclick = () => { const r = evaluate(fakeMission); document.getElementById('panelx').innerHTML = renderBadges(r, q.get('lang') || 'en'); };
+if (q.get('run')) document.getElementById(q.get('run')).click();
+</script></body></html>

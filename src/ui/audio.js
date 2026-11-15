@@ -46,6 +46,11 @@ function burst(dur, vol, freq, q = 1) {
   src.connect(f); f.connect(g); g.connect(master); src.start(t);
 }
 export const sfx = {
+  hit: () => { if (!enabled || !unlocked) return; const a = ac(), t = a.currentTime; const o = a.createOscillator(), g = a.createGain(); o.type = 'sine'; o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(38, t + 0.5); g.gain.setValueAtTime(0.55, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.7); o.connect(g); g.connect(master); o.start(t); o.stop(t + 0.75); burst(0.12, 0.35, 2600, 0.7); },
+  drone: (dur = 20) => { if (!enabled || !unlocked) return; const a = ac(), t = a.currentTime; [55, 82.4, 110.2].forEach((f, i) => { const o = a.createOscillator(), g = a.createGain(); o.type = i ? 'triangle' : 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(i ? 0.03 : 0.08, t + 2.5); g.gain.setValueAtTime(i ? 0.03 : 0.08, t + dur - 2); g.gain.linearRampToValueAtTime(0, t + dur); o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.1); }); },
+  riser: (dur = 4) => { if (!enabled || !unlocked) return; const a = ac(), t = a.currentTime; const o = a.createOscillator(), g = a.createGain(); o.type = 'sawtooth'; o.frequency.setValueAtTime(80, t); o.frequency.exponentialRampToValueAtTime(900, t + dur); const f = a.createBiquadFilter(); f.type = 'lowpass'; f.frequency.setValueAtTime(300, t); f.frequency.exponentialRampToValueAtTime(5000, t + dur); g.gain.setValueAtTime(0.0, t); g.gain.linearRampToValueAtTime(0.09, t + dur * 0.95); g.gain.linearRampToValueAtTime(0, t + dur); o.connect(f); f.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05); noise(dur, 0.35, 1200, dur * 0.9); },
+  boom: () => { noise(3.5, 1.0, 180, 0.02); sfx.hit(); },
+
   step: (surface = 'concrete', sprint = false) => {
     const base = surface === 'metal' ? 2400 : surface === 'grass' ? 700 : 1300;
     burst(sprint ? 0.09 : 0.07, sprint ? 0.5 : 0.32, base * (0.85 + Math.random() * 0.3), surface === 'metal' ? 4 : 1.2);

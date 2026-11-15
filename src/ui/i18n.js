@@ -1,5 +1,6 @@
 // Two languages: English (default for international judges) and Korean.
 let lang = (() => {
+  const q = new URLSearchParams(location.search).get('lang'); if (q === 'ko' || q === 'en') return q;
   try { const s = localStorage.getItem('mmb-lang'); if (s) return s; } catch (e) { /* storage blocked */ }
   return (navigator.language || 'en').toLowerCase().startsWith('ko') ? 'ko' : 'en';
 })();

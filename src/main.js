@@ -19,6 +19,8 @@ import { LaunchScene } from './scenes/LaunchScene.js';
 import { SpaceScene } from './scenes/SpaceScene.js';
 import { FPController } from './game/fpcontrols.js';
 import { createSpacecraft, updateSpacecraft } from './models/spacecraft.js';
+import { tagMinigame, goNoGoPoll, alertTimer } from './ui/minigames.js';
+import { evaluate, renderBadges } from './game/achievements.js';
 
 // optional modules (built in parallel; the game still runs without them)
 const campusMods = import.meta.glob('./scenes/CampusScene.js');
@@ -68,6 +70,9 @@ function setStage(which, mode, opts) {
   if (orbitOn && orbitOn !== target) { orbitOn.disableOrbit?.(); orbitOn = null; }
   active = target;
   active.resize?.(innerWidth, innerHeight);
+  if (target === campus) { bloom.strength = 0.42; bloom.threshold = 0.95; bloom.radius = 0.4; renderer.toneMappingExposure = 0.92; }
+  else if (target === launchScene) { bloom.strength = 0.7; bloom.threshold = 0.92; bloom.radius = 0.5; renderer.toneMappingExposure = 1.0; }
+  else { bloom.strength = 0.85; bloom.threshold = 0.85; bloom.radius = 0.5; renderer.toneMappingExposure = 1.0; }
   if (which === 'space' && mode) spaceScene.setMode(mode, opts || {});
 }
 function enableOrbit() { if (active?.enableOrbit && active !== campus) { active.enableOrbit(canvas); orbitOn = active; } }
@@ -77,10 +82,12 @@ function frame() {
   requestAnimationFrame(frame);
   const dt = Math.min(0.05, clock.getDelta());
   if (!active) return;
-  if (active === campus && fp) {
+  if (active === campus && introAnim) { introAnim(dt); }
+  else if (active === campus && fp) {
     fp.update(dt);
     rig?.update(dt, { ...fp.state, time: clock.elapsedTime });
-  }
+    updateWaypoint();
+  } else if (!$('#wp').classList.contains('hidden')) $('#wp').classList.add('hidden');
   active.update?.(dt);
   renderPass.scene = active.scene; renderPass.camera = active.camera;
   composer.render();
@@ -397,13 +404,17 @@ async function eventDecision(ev) {
   const pRun = mission.failProb(ev, false), pSafe = mission.failProb(ev, true);
   const sw = D.game_config.space_weather;
   const typeName = { solar_flare: T('Solar flare', '태양 플레어'), geomagnetic_storm: T('Geomagnetic storm', '지자기 폭풍') }[ev.type] || T('Coronal mass ejection', '코로나 질량 방출');
-  const choice = await modal(`
+  const choiceP = modal(`
     <div class="alarm-k">⚠ ${T('SPACE WEATHER ALERT', '우주 날씨 경보')} · ${phaseName(ev.phase)}</div>
     <h3>${typeName} ${ev.detail && ev.type === 'solar_flare' ? ev.detail : ''}</h3>
     <div class="stats"><div class="badv"><b>${ev.severity}/5</b><span>${T('severity', '위험도')}</span></div><div><b>Lv ${S.shield}</b><span>${T('your shielding', '내 차폐')}</span></div><div><b>${ev.time.slice(0, 10)}</b><span>${T('real DONKI record', '실제 DONKI 기록')}</span></div></div>
     <button class="choice" data-choice="safe"><b>🛡 ${T('Safe mode', '안전 모드')}</b><span>${T('risk', '고장 위험')} ${Math.round(pSafe * 100)}% · +${sw.safe_mode_days} ${T('days', '일')} · +${money(sw.safe_mode_days * sw.extra_day_cost_musd)}</span></button>
     <button class="choice" data-choice="run"><b>▶ ${T('Keep operating', '계속 운영')}</b><span>${T('risk', '고장 위험')} ${Math.round(pRun * 100)}%</span></button>
-    <p class="src"><a href="${ev.source}" target="_blank" rel="noopener">NASA DONKI ↗</a> ${ev.scale}</p>`, { alarm: true });
+    <p class="src"><a href="${ev.source}" target="_blank" rel="noopener">NASA DONKI ↗</a> ${ev.scale} · ${T('decide before the timer runs out', '제한 시간 안에 결정')}</p>`, { alarm: true });
+  $('#modal-card').style.position = 'relative';
+  const timer = alertTimer(12, () => $('#modal [data-choice="run"]')?.click());
+  $('#modal-card').appendChild(timer.el);
+  const choice = await choiceP; timer.stop();
   const out = mission.resolveEvent(ev, choice);
   opsLog(out.text, out.hit ? 'bad' : 'ok');
   if (out.hit) sfx.error();
@@ -469,7 +480,12 @@ async function showOps() {
   while (true) {
     speak(T('Go for TAG.', '채취 진행.'));
     await runCinematic('TOUCH-AND-GO', `Nightingale · ${T('success chance', '성공 확률')} ${Math.round(mission.tagChance() * 100)}%`, 14000, (done) => spaceScene.playTAG ? spaceScene.playTAG(done) : setTimeout(done, 3000));
+    let tg = { bonus: 0, grade: '' };
+    if (S.instruments.has('tagsam') && S.instruments.has('src')) { try { tg = await tagMinigame({ chance: mission.tagChance() }); } catch (e) { /* skip */ } }
+    mission.damage.tagsamPenalty -= tg.bonus;
     tagRes = mission.tag();
+    mission.damage.tagsamPenalty += tg.bonus;
+    if (tg.grade) opsLog({ en: `Manual TAG timing: ${tg.grade} (${tg.bonus >= 0 ? '+' : ''}${Math.round(tg.bonus * 100)}% success chance)`, ko: `수동 TAG 타이밍: ${tg.grade} (성공 확률 ${tg.bonus >= 0 ? '+' : ''}${Math.round(tg.bonus * 100)}%)` }, tg.bonus >= 0 ? 'ok' : 'warn');
     opsLog(tagRes.text, tagRes.ok ? 'ok' : 'bad');
     tagRes.ok ? sfx.success() : sfx.error();
     if (tagRes.final) break;
@@ -531,6 +547,7 @@ function showReport() {
     <div class="verdict ${win ? 'win' : 'lose'}">${win ? T('MISSION SUCCESS', '임무 성공') : T('MISSION FAILED', '임무 실패')}</div>
     <div class="scoreline"><span class="score-big">${fmt(sc.total)}</span><span class="src">${T('points', '점')}</span>${win ? `<span class="pill">${m.sampleG} g ${T('of Bennu', '베누 샘플')}</span>` : ''}</div>
     <div class="kv tight">${sc.rows.map((r) => `<span>${L(r[0])}</span><b class="${r[1] < 0 ? 'neg' : ''}">${r[1] > 0 ? '+' : ''}${fmt(r[1])}</b>`).join('')}</div>
+    ${(() => { try { report.ach = report.ach || evaluate(m, S, C); return renderBadges(report.ach, getLang()); } catch (e) { return ''; } })()}
     <h2>${T('Why', '원인')}</h2>
     <ul class="causes">${m.causes.map((x) => `<li class="${x.kind}">${L(x.text)}</li>`).join('')}</ul>
     <h2>${T('You vs OSIRIS-REx', '나 vs OSIRIS-REx')}</h2>
@@ -538,7 +555,7 @@ function showReport() {
     <details class="src"><summary>${T('Space weather flown through (NASA DONKI)', '겪은 우주 날씨 (NASA DONKI)')}</summary><ul class="causes">${m.events.filter((e) => e.choice).map((e) => `<li class="${e.outcome?.hit ? 'fail' : 'ok'}"><a href="${e.source}" target="_blank" rel="noopener">${e.title_en}</a> ${e.time.slice(0, 10)} — ${L(e.outcome?.text)}</li>`).join('')}</ul></details>
     <details class="src"><summary>${T('Data sources', '데이터 출처')}</summary>NASA CCMC DONKI · JPL Small-Body Mission Design API · NASA Science OSIRIS-REx · NASA press kit · OLA/OVIRS/OTES/REXIS papers · eoPortal · L3Harris MR-107S · NASA DART &amp; Psyche contracts · NASA LSP. ${T('Game-defined values are listed in the README. Built with AI assistance (Claude).', '게임용 값은 README에 정리. AI(Claude) 도움으로 제작.')}</details>
     <div class="btn-row"><button class="btn" id="again">${MODE === 'menu' ? T('Redesign', '다시 설계') : T('Back to campus', '캠퍼스로')}</button><button class="btn ghost" id="restart">${T('New mission', '새 임무')}</button></div>`;
-  $('#again').onclick = () => { mission = null; if (MODE === 'menu') go('build'); else returnToCampus(); };
+  $('#again').onclick = () => { const w = mission?.result.primary; mission = null; if (MODE === 'menu') go('build'); else { returnToCampus(); setTimeout(() => storyAfterMission(w), 900); } };
   $('#restart').onclick = () => { mission = null; report = null; S = defaultState(D); maxReached = 0; Object.keys(visited).forEach((k) => (visited[k] = false)); syncCampusSpacecraft(); if (MODE === 'menu') go('briefing'); else returnToCampus(true); };
 }
 
@@ -558,7 +575,7 @@ const ORDER = ['briefing', 'flight_dynamics', 'assembly', 'launch_control'];
 function nextObjective() { return ORDER.find((id) => !visited[id]) || 'launch_control'; }
 function setExploreHud(on) {
   ['#crosshair', '#objective', '#fasttravel'].forEach((s) => $(s).classList.toggle('hidden', !on));
-  if (!on) $('#prompt').classList.add('hidden');
+  if (!on) { $('#prompt').classList.add('hidden'); $('#hint').classList.add('hidden'); $('#radio').classList.add('hidden'); }
 }
 function updateObjectiveHud() {
   if (!campus) return;
@@ -631,6 +648,7 @@ function enterExplore(lock = true) {
   setExploreHud(true);
   refreshChrome(); drawTablet();
   if (lock) fp?.lock();
+  setTimeout(() => objectiveRadio(), 600);
 }
 function returnToCampus(reset) {
   if (!campus) { MODE = 'menu'; go('briefing'); return; }
@@ -665,6 +683,9 @@ async function launchControl() {
   if (ch !== 'go') { fp?.lock(); return; }
   MODE = 'terminal';
   setExploreHud(false);
+  speak(T('Launch director polling stations for GO, NO-GO.', '발사 책임자, 부서별 GO, NO-GO 확인합니다.'));
+  const items = [T('Flight Dynamics', '비행 역학'), T('Propulsion', '추진'), T('Power', '전력'), T('Comms', '통신'), T('Range', '발사장'), T('Weather', '기상'), T('Spacecraft', '우주선')];
+  try { await goNoGoPoll({ items }); } catch (e) { /* skip */ }
   speak(T('Launch director: we are go for launch.', '발사 책임자: 발사를 승인합니다.'));
   go('ops');
 }
@@ -692,6 +713,159 @@ function showBoard(id) {
   modal(`<div class="alarm-k" style="color:var(--miku)">${T('EXHIBIT', '전시')}</div><h3>${B[0]}</h3><div class="bigeq">${B[1]}</div><p>${B[2]}</p><div class="live">${B[3]}</div><button class="choice" data-choice="ok"><b>${T('Close', '닫기')}</b></button>`).then(() => { fp?.lock(); });
 }
 
+// ---------- guidance: waypoint arrow, flight-director radio, control hints
+const DIR = () => T('FLIGHT DIRECTOR · MINA KANG', '비행 관제관 · 강미나');
+const FIDO = () => T('FLIGHT DYNAMICS · LEO ORTIZ', '비행 역학 · 레오 오르티스');
+const STORY = {
+  briefing: () => [
+    [DIR(), T('You made it. The launch window opens in 72 hours and our mission board is still empty.', '왔군요. 발사창이 72시간 뒤에 열리는데 임무 보드는 아직 비어 있어요.')],
+    [DIR(), T('Start inside Mission Control, at the holo table. Tell me what science we are flying for.', '관제센터 안 홀로그램 테이블부터 가요. 이번에 어떤 과학을 하러 가는지 정해 주세요.')],
+  ],
+  flight_dynamics: () => [
+    [DIR(), T('Objectives logged. Leo at Flight Dynamics has the trajectories from JPL.', '목표 등록 완료. 비행 역학 콘솔의 레오가 JPL 궤도 자료를 갖고 있어요.')],
+    [FIDO(), T('48 ways to get to Bennu, but only 9 slow enough to stop there. Pick one, then a rocket that can lift us.', '베누까지 가는 길은 48개인데 거기서 멈출 수 있을 만큼 느린 건 9개뿐이에요. 하나 고르고, 우리를 들어 올릴 로켓도 골라요.')],
+  ],
+  assembly: () => [
+    [FIDO(), T('Trajectory locked. Remember: higher launch energy means less mass the rocket can carry.', '궤도 확정. 발사 에너지가 클수록 로켓이 실을 수 있는 질량은 줄어요.')],
+    [DIR(), T('Head to the Payload Processing Facility across the plaza and build her. Every kilogram costs propellant. That is Tsiolkovsky, not me.', '광장 건너편 페이로드 처리동으로 가서 우주선을 조립해요. 1 kg 늘 때마다 추진제가 더 들어요. 제가 아니라 치올콥스키 법칙이에요.')],
+  ],
+  launch_control: () => [
+    [DIR(), T('She looks beautiful. The Rocket Garden exhibits on the avenue explain the physics if you want a refresher.', '멋지네요. 길가의 로켓 가든 안내판에 물리 원리가 정리돼 있으니 한번 보고 가도 좋아요.')],
+    [DIR(), T('When you are ready, the Launch Director console is in Mission Control. We go on your call.', '준비되면 관제센터의 LAUNCH DIRECTOR 콘솔로 오세요. 당신 신호에 맞춰 발사합니다.')],
+  ],
+};
+let lastRadio = null, radioTimer = null, radioQueue = [], radioBusy = false;
+function radio(text, who) { radioQueue.push([who || DIR(), text]); if (!radioBusy) nextRadio(); }
+function nextRadio() {
+  const r = $('#radio');
+  const item = radioQueue.shift();
+  if (!item || (MODE !== 'explore' && !introOn)) { radioBusy = false; r.classList.add('hidden'); return; }
+  radioBusy = true;
+  const [who, text] = item;
+  r.querySelector('.who').textContent = who;
+  const msg = r.querySelector('.msg'); msg.textContent = '';
+  r.classList.remove('hidden'); r.style.animation = 'none'; void r.offsetWidth; r.style.animation = '';
+  sfx.beep(); speak(text, 1.06);
+  let i = 0; const tw = setInterval(() => { msg.textContent = text.slice(0, ++i); if (i >= text.length) clearInterval(tw); }, 18);
+  clearTimeout(radioTimer); radioTimer = setTimeout(nextRadio, Math.max(4200, text.length * 62));
+}
+function objectiveRadio(force) {
+  const n = nextObjective();
+  if (force || n !== lastRadio) { lastRadio = n; if (MODE === 'explore') { radioQueue = []; STORY[n]().forEach(([w, t]) => radio(t, w)); } }
+}
+function storyAfterMission(win) {
+  radioQueue = [];
+  radio(win ? T('121.6 grams was the record. You just rewrote it. Want to fly it again, leaner?', '기록은 121.6 g이었죠. 방금 그 숫자를 바꿨어요. 더 가볍게 다시 날아볼래요?')
+            : T('Space does not forgive. Read the report, fix the design, and we fly again.', '우주는 봐주지 않아요. 리포트를 보고 설계를 고친 다음 다시 갑시다.'));
+}
+const HINTS = [
+  () => `<kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> ${T('move', '이동')} · <kbd>Shift</kbd> ${T('sprint', '달리기')}`,
+  () => `${T('Follow the', '화면의')} <b style="color:var(--miku)">▲</b> ${T('marker to your objective', '표시를 따라 목표로 이동')}`,
+  () => `${T('When the circle lights up, press', '조준 원이 빛나면')} <kbd>E</kbd> ${T('to use', '로 사용')}`,
+  () => `<kbd>Tab</kbd> ${T('mission tablet', '임무 태블릿')} · <kbd>1</kbd>–<kbd>6</kbd> ${T('fast travel', '빠른 이동')}`,
+];
+let hintIdx = -1, hintTimer = null;
+function startHints() {
+  if (hintIdx >= 0) return;
+  hintIdx = 0;
+  const step = () => {
+    const h = $('#hint');
+    if (hintIdx >= HINTS.length || MODE !== 'explore') { h.classList.add('hidden'); return; }
+    h.innerHTML = HINTS[hintIdx](); h.classList.remove('hidden');
+    hintIdx++; hintTimer = setTimeout(step, 6000);
+  };
+  step();
+}
+// ---------- opening cinematic: launch-promo grammar (macro detail hard cuts, kinetic type cards, countdown, flash, logo build) ----------
+let introOn = false, introAnim = null, introSeen = false;
+function playIntro() {
+  return new Promise((resolve) => {
+    if (!campus) { resolve(); return; }
+    introOn = true; introSeen = true;
+    fp.enabled = false; if (rig) rig.group.visible = false;
+    $('#wp').classList.add('hidden'); campus.setObjective?.(null);
+    const pz = S.vehicleId === 'atlas_v_411' ? -410 : -455;
+    const V = (x, y, z) => new THREE.Vector3(x, y, z);
+    const pr = $('#promo'), card = pr.querySelector('.card'), cnt = pr.querySelector('.count'), fl = pr.querySelector('.flash'), ttl = pr.querySelector('.title');
+    const C_ = (en, ko, sub) => ({ card: [T(en, ko), sub || ''] });
+    const SH = (p0, p1, t0, t1, d) => ({ shot: [p0, p1, t0, t1], d });
+    const seq = [
+      { ...C_('4.5 BILLION YEARS', '45억 년', T('THE DUST OF THE YOUNG SOLAR SYSTEM', '태양계가 태어날 때의 먼지')), d: 1.9 },
+      SH(V(11, 6, pz + 10), V(9, 7.5, pz + 8), V(4, 6, pz), V(4, 9, pz), 1.7),
+      SH(V(16, 48, pz + 16), V(13, 52, pz + 13), V(4, 54, pz), V(4, 57, pz), 1.6),
+      { ...C_('121.6 GRAMS', '121.6 g', T('OSIRIS-REx · 2023 · ASTEROID BENNU', 'OSIRIS-REx · 2023 · 소행성 베누')), d: 1.9 },
+      SH(V(34, 3, pz + 46), V(30, 3.5, pz + 40), V(4, 30, pz), V(4, 46, pz), 1.5),
+      SH(V(31.6, 2.2, -20.6), V(30.8, 2.3, -21.2), V(29, 1.9, -23), V(29, 2.4, -23), 1.5),
+      { ...C_('ONE MORE TIME', '다시 한번', T('BENNU IS CALLING', '베누가 부른다')), d: 1.8 },
+      SH(V(-18, 2.0, -15), V(-16, 2.6, -16), V(-20, 2.6, -29), V(-18, 3.2, -29), 1.5),
+      { ...C_('THIS TIME', '이번엔', T('YOU DESIGN THE MISSION', '당신이 임무를 설계한다')), d: 2.0 },
+      { ...SH(V(30, 14, pz + 50), V(120, 64, pz + 230), V(4, 26, pz), V(4, 34, pz), 5.2), countdown: true },
+      { title: true, d: 3.6 },
+    ];
+    let i = -1, t = 0, last = performance.now(), cdShown = -1;
+    skipCine = false; pr.classList.remove('hidden');
+    pr.querySelector('.skip').textContent = T('Skip ▶▶', '건너뛰기 ▶▶');
+    pr.querySelector('.skip').onclick = () => { skipCine = true; };
+    sfx.drone(26);
+    const cam = campus.camera, tmp = new THREE.Vector3();
+    const enter = (k) => {
+      const it = seq[k]; card.classList.remove('on'); ttl.classList.remove('on'); cnt.textContent = '';
+      if (it.card) { card.innerHTML = `<div><b>${it.card[0]}</b><small>${it.card[1]}</small></div>`; card.classList.add('on'); sfx.hit(); }
+      else if (it.title) { fl.classList.remove('go'); void fl.offsetWidth; fl.classList.add('go'); ttl.classList.add('on'); sfx.boom(); }
+      else { sfx.hit(); if (it.countdown) sfx.riser(5); }
+    };
+    const finish = () => {
+      introAnim = null; introOn = false; pr.classList.add('hidden'); card.classList.remove('on'); ttl.classList.remove('on');
+      fp.enabled = true; if (rig) rig.group.visible = true;
+      fp.teleport(campus.spawn.position, campus.spawn.yaw);
+      resolve();
+    };
+    const advance = () => { i++; t = 0; if (i >= seq.length) { finish(); return false; } enter(i); return true; };
+    advance();
+    introAnim = () => {
+      if (skipCine) { finish(); return; }
+      const now = performance.now(); t += Math.min(0.25, (now - last) / 1000); last = now;
+      const it = seq[i];
+      if (it.shot) {
+        const k = Math.min(1, t / it.d), e = 1 - Math.pow(1 - k, 2);
+        cam.position.lerpVectors(it.shot[0], it.shot[1], e);
+        tmp.lerpVectors(it.shot[2], it.shot[3], e); cam.lookAt(tmp);
+        if (it.countdown) { const n = Math.max(1, 5 - Math.floor(t)); if (n !== cdShown) { cdShown = n; cnt.innerHTML = `T−${n}<small>${T('LAUNCH WINDOW', '발사창')}</small>`; sfx.beep(); } }
+      }
+      if (t >= it.d) advance();
+    };
+  });
+}
+
+const _wpV = new THREE.Vector3();
+function updateWaypoint() {
+  const el = $('#wp');
+  if (!campus || MODE !== 'explore' || !fp) { el.classList.add('hidden'); return; }
+  const it = campus.interactables?.find((x) => x.id === nextObjective());
+  if (!it) { el.classList.add('hidden'); return; }
+  const cam = campus.camera;
+  const d = cam.position.distanceTo(it.position);
+  if (d < 3.2) { el.classList.add('hidden'); return; }
+  _wpV.copy(it.position); _wpV.y += 1.2; _wpV.project(cam);
+  const behind = _wpV.z > 1;
+  let x = (_wpV.x * 0.5 + 0.5) * innerWidth, y = (-_wpV.y * 0.5 + 0.5) * innerHeight;
+  if (behind) { x = innerWidth - x; y = innerHeight - y; }
+  const m = 60, onScreen = !behind && x > m && x < innerWidth - m && y > 110 && y < innerHeight - m;
+  const arr = el.querySelector('.arr');
+  if (onScreen) { arr.style.transform = 'rotate(180deg)'; el.classList.remove('edge'); }
+  else {
+    const cx = innerWidth / 2, cy = innerHeight / 2;
+    let dx = x - cx, dy = y - cy; if (behind && Math.abs(dy) < 1) dy = 1;
+    const k = Math.min((cx - m) / Math.abs(dx || 1e-6), (cy - 110) / Math.abs(dy || 1e-6));
+    x = cx + dx * k; y = cy + dy * k;
+    arr.style.transform = `rotate(${Math.atan2(dy, dx) * 180 / Math.PI + 90}deg)`; el.classList.add('edge');
+  }
+  el.style.left = x + 'px'; el.style.top = y + 'px';
+  el.querySelector('b').textContent = `${Math.round(d)} m`;
+  el.querySelector('span').textContent = STATION[it.id]()[0];
+  el.classList.remove('hidden');
+}
+
 function setupCampus(CampusScene) {
   campus = new CampusScene({ vehicleId: S.vehicleId });
   campus.setRenderer?.(renderer);
@@ -708,7 +882,7 @@ function setupCampus(CampusScene) {
   fp.onStep = (s) => { const p = campus.camera.position; sfx.step(campus.footstepSurface ? campus.footstepSurface(p.x, p.z) : 'concrete', s.sprint); };
   fp.onLand = (k) => sfx.land(k);
   fp.onJump = () => sfx.jump();
-  fp.onUnlock = () => { if (MODE === 'explore' && $('#modal').classList.contains('hidden')) showStart(true); };
+  fp.onUnlock = () => { if (MODE === 'explore' && !introOn && $('#modal').classList.contains('hidden')) showStart(true); };
   fp.onLock = () => { $('#start').classList.add('hidden'); };
   syncCampusSpacecraft();
 }
@@ -720,7 +894,19 @@ function showStart(paused) {
   st.querySelector('p').innerHTML = T('You are the lead designer of an asteroid sample-return mission to <b>101955 Bennu</b>. Walk the campus, use the consoles, build the spacecraft, launch.', '당신은 소행성 <b>101955 베누</b> 샘플 귀환 임무의 수석 설계자예요. 캠퍼스를 걸어다니며 콘솔을 쓰고, 우주선을 만들고, 발사하세요.');
   st.querySelector('.keys').innerHTML = `<span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> ${T('move', '이동')}</span><span><kbd>Shift</kbd> ${T('sprint', '달리기')}</span><span><kbd>C</kbd> ${T('crouch', '앉기')}</span><span><kbd>Space</kbd> ${T('jump', '점프')}</span><span><kbd>E</kbd> ${T('use', '사용')}</span><span><kbd>Tab</kbd> ${T('tablet', '태블릿')}</span><span><kbd>1</kbd>–<kbd>6</kbd> ${T('fast travel', '빠른 이동')}</span>`;
 }
-$('#start-btn').onclick = () => { sfx.click(); $('#start').classList.add('hidden'); if (MODE !== 'explore') enterExplore(true); else fp.lock(); };
+$('#start-btn').onclick = async () => {
+  sfx.click(); $('#start').classList.add('hidden');
+  if (!introSeen && campus && !params.get('nointro')) {
+    MODE = 'explore'; setStage('campus'); setExploreHud(false);
+    fp.lock();
+    await playIntro();
+    setExploreHud(true); updateObjectiveHud();
+    if (!fp.locked) fp.lock();
+    startHints(); objectiveRadio(true); return;
+  }
+  if (MODE !== 'explore') enterExplore(true); else fp.lock();
+  startHints(); objectiveRadio();
+};
 $('#menu-btn').onclick = () => { sfx.click(); $('#start').classList.add('hidden'); MODE = 'menu'; go('briefing'); };
 
 addEventListener('keydown', (e) => {
@@ -785,5 +971,5 @@ async function boot() {
   }
   setTimeout(() => $('#loading').classList.add('done'), 300);
 }
-window.__mmb = { openStation: (id) => openStation(id), fastTravel: (id) => fastTravel(id), enter: () => enterExplore(false), state: () => ({ MODE, screen, visited, C }) };
+window.__mmb = { intro: () => playIntro(), radio: () => objectiveRadio(true), hints: () => startHints(), openStation: (id) => openStation(id), fastTravel: (id) => fastTravel(id), enter: () => enterExplore(false), state: () => ({ MODE, screen, visited, C }) };
 boot().catch((e) => { console.error(e); $('.load-sub').textContent = 'Error: ' + e.message; });
