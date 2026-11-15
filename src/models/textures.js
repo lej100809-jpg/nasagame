@@ -82,7 +82,7 @@ export function solarTexture() {
     g.strokeStyle = 'rgba(160,190,255,0.18)'; g.lineWidth = 1;
     g.beginPath(); g.moveTo(i * cw + cw / 2, j * ch + 2); g.lineTo(i * cw + cw / 2, j * ch + ch - 2); g.stroke();
   }
-  g.strokeStyle = '#c9ced8'; g.lineWidth = 6; g.strokeRect(0, 0, W, H);
+  g.strokeStyle = '#6a707a'; g.lineWidth = 6; g.strokeRect(0, 0, W, H);
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
   t.anisotropy = 4;

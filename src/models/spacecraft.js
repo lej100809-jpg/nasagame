@@ -24,6 +24,7 @@ function materials() {
     solarBack: new THREE.MeshStandardMaterial({ color: 0x8c8f95, metalness: 0.6, roughness: 0.5 }),
     lens: new THREE.MeshStandardMaterial({ color: 0x1a2a55, metalness: 1, roughness: 0.05, emissive: 0x0a1430, emissiveIntensity: 0.6 }),
     shield: new THREE.MeshStandardMaterial({ color: 0x3b3f46, metalness: 0.7, roughness: 0.45 }),
+    frame: new THREE.MeshStandardMaterial({ color: 0x5d626b, metalness: 0.5, roughness: 0.6 }),
     capsule: new THREE.MeshStandardMaterial({ color: 0x5b4636, metalness: 0.2, roughness: 0.8 }),
     capsuleTop: new THREE.MeshStandardMaterial({ color: 0xb8b3aa, metalness: 0.3, roughness: 0.6 }),
     dish: new THREE.MeshStandardMaterial({ color: 0xf4f2ec, metalness: 0.15, roughness: 0.45, side: THREE.DoubleSide }),
@@ -103,11 +104,11 @@ function buildSolar(g, M, kind) {
     pivot.rotation.z = s * 0.32; // Y-wing tilt
     g.add(pivot);
     const yoke = cyl(0.03, 0.03, 0.35, M.metal, 8); yoke.rotation.z = Math.PI / 2; yoke.position.x = s * 0.17; pivot.add(yoke);
-    const panel = new THREE.Group(); panel.position.x = s * (0.35 + wingLen / 2); panel.rotation.x = -1.05; pivot.add(panel);
+    const panel = new THREE.Group(); panel.position.x = s * (0.35 + wingLen / 2); panel.rotation.x = 1.05; pivot.add(panel);
     const front = new THREE.Mesh(new THREE.PlaneGeometry(wingLen, wingW), M.solar);
     front.rotation.x = -Math.PI / 2; front.position.y = 0.012; panel.add(front);
     const back = box(wingLen, 0.02, wingW, M.solarBack); panel.add(back);
-    const frame = box(wingLen + 0.04, 0.035, 0.04, M.metal); frame.position.z = wingW / 2; panel.add(frame);
+    const frame = box(wingLen + 0.04, 0.035, 0.04, M.frame); frame.position.z = wingW / 2; panel.add(frame);
     const frame2 = frame.clone(); frame2.position.z = -wingW / 2; panel.add(frame2);
     wings.push(pivot);
   }

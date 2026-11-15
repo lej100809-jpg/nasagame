@@ -1,0 +1,87 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>FP rig test</title>
+<style>html,body{margin:0;height:100%;overflow:hidden;background:#000}canvas{display:block}#i{position:fixed;left:10px;top:10px;color:#9fd;font:12px monospace}</style></head>
+<body><div id="i">click: lock · WASD · Shift sprint · C crouch · Space jump · Tab raise tablet</div>
+<script type="module">
+import * as THREE from 'three';
+import { PointerLockControls } from 'three/addons/controls/PointerLockControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { createFPRig } from '../src/models/fpRig.js';
+
+const q = new URLSearchParams(location.search);
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight); renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.outputColorSpace = THREE.SRGBColorSpace;
+document.body.appendChild(renderer.domElement);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x0b0f16);
+const pm = new THREE.PMREMGenerator(renderer);
+scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture;
+const camera = new THREE.PerspectiveCamera(72, innerWidth / innerHeight, 0.05, 500);
+camera.position.set(0, 1.7, 4);
+scene.add(camera);
+// room
+const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshStandardMaterial({ color: 0x2a3038, roughness: 0.6 }));
+floor.rotation.x = -Math.PI / 2; scene.add(floor);
+const grid = new THREE.GridHelper(40, 40, 0x39c5bb, 0x1d2a33); grid.position.y = 0.002; scene.add(grid);
+for (let i = 0; i < 6; i++) {
+  const b = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1 + i * 0.4, 1.2), new THREE.MeshStandardMaterial({ color: 0x46505c, roughness: 0.7 }));
+  b.position.set(-6 + i * 2.4, (1 + i * 0.4) / 2, -6); scene.add(b);
+}
+const wall = new THREE.Mesh(new THREE.BoxGeometry(40, 6, 0.4), new THREE.MeshStandardMaterial({ color: 0x1c232c }));
+wall.position.set(0, 3, -12); scene.add(wall);
+const sun = new THREE.DirectionalLight(0xffd2a0, 2.2); sun.position.set(5, 8, 3); scene.add(sun);
+scene.add(new THREE.HemisphereLight(0x8fb0ff, 0x202020, 0.6));
+
+const rig = createFPRig();
+camera.add(rig.group);
+if (q.get('raised')) rig.raise(true);
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(innerWidth, innerHeight), 0.5, 0.5, 0.92));
+composer.addPass(new OutputPass());
+
+const controls = new PointerLockControls(camera, document.body);
+document.body.addEventListener('click', () => controls.lock());
+const keys = {};
+let lookDX = 0, lookDY = 0;
+addEventListener('mousemove', (e) => { if (controls.isLocked) { lookDX += e.movementX; lookDY += e.movementY; } });
+addEventListener('keydown', (e) => { keys[e.code] = true; if (e.code === 'Tab') { e.preventDefault(); rig.raise(!rig.isRaised()); } if (e.code === 'Space' && grounded) { vy = 4.2; grounded = false; } });
+addEventListener('keyup', (e) => { keys[e.code] = false; });
+let vy = 0, grounded = true, eyeH = 1.7;
+const vel = new THREE.Vector3();
+const clock = new THREE.Clock();
+const autoWalk = q.get('walk'), autoSprint = q.get('sprint');
+// warm-up so screenshots show the settled pose (software GL renders few frames)
+for (let i = 0; i < 240; i++) rig.update(1 / 60, { speed: autoSprint ? 7.5 : autoWalk ? 3.4 : 0, sprint: !!autoSprint, grounded: true, time: i / 60 });
+function loop() {
+  requestAnimationFrame(loop);
+  const dt = Math.min(0.05, clock.getDelta());
+  const f = (keys.KeyW ? 1 : 0) - (keys.KeyS ? 1 : 0) + (autoWalk || autoSprint ? 1 : 0);
+  const s = (keys.KeyD ? 1 : 0) - (keys.KeyA ? 1 : 0);
+  const sprint = !!keys.ShiftLeft || !!autoSprint;
+  const crouch = !!keys.KeyC;
+  const spd = sprint ? 7.5 : crouch ? 1.8 : 3.4;
+  const fwd = new THREE.Vector3(); camera.getWorldDirection(fwd); fwd.y = 0; fwd.normalize();
+  const right = new THREE.Vector3().crossVectors(fwd, camera.up).normalize();
+  const want = new THREE.Vector3().addScaledVector(fwd, f).addScaledVector(right, s);
+  if (want.lengthSq()) want.normalize().multiplyScalar(spd);
+  vel.lerp(want, 1 - Math.exp(-10 * dt));
+  camera.position.addScaledVector(vel, dt);
+  if (autoWalk || autoSprint) { if (camera.position.z < -8) camera.position.z = 4; }
+  vy -= 9.8 * dt; camera.position.y += vy * dt;
+  eyeH += ((crouch ? 1.15 : 1.7) - eyeH) * (1 - Math.exp(-10 * dt));
+  if (camera.position.y <= eyeH) { camera.position.y = eyeH; vy = 0; grounded = true; }
+  rig.update(dt, { speed: Math.hypot(vel.x, vel.z), sprint, crouch, grounded, lookDX, lookDY, strafe: s, time: clock.elapsedTime });
+  lookDX = lookDY = 0;
+  composer.render();
+}
+loop();
+addEventListener('resize', () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); composer.setSize(innerWidth, innerHeight); });
+window.__rig = rig;
+</script></body></html>

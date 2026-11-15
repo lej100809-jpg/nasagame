@@ -21,6 +21,8 @@
     <div class="logo" data-go="briefing">MIKU<span>☆</span>MIKU<span>☆</span>BEAM</div>
     <nav id="stepper"></nav>
     <div id="topright">
+      <button id="btn-lang" class="icon-btn txt" title="English / 한국어" aria-label="Language">한</button>
+      <button id="btn-q" class="icon-btn txt" title="Graphics quality" aria-label="Graphics quality">HQ</button>
       <button id="btn-sound" class="icon-btn" title="Sound on/off" aria-label="Toggle sound">🔊</button>
       <button id="btn-help" class="icon-btn" title="How to play" aria-label="How to play">?</button>
     </div>
@@ -41,6 +43,20 @@
     <button id="cine-skip">Skip ▶▶</button>
   </div>
 
+  <div id="crosshair" class="hidden"><i></i></div>
+  <div id="prompt" class="hidden"></div>
+  <div id="objective" class="hidden"></div>
+  <div id="fasttravel" class="hidden"></div>
+  <div id="start" class="hidden">
+    <div class="start-card">
+      <div class="load-logo">MIKU<span>☆</span>MIKU<span>☆</span>BEAM</div>
+      <div class="start-sub">Space Launch Complex · Cape Canaveral · dusk</div>
+      <p>You are the lead mission designer of an asteroid sample-return mission to <b>101955 Bennu</b>. Walk the launch campus, use the consoles, build the spacecraft and send it to Bennu.</p>
+      <div class="keys"><span><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> move</span><span><kbd>Shift</kbd> run</span><span><kbd>Mouse</kbd> look</span><span><kbd>E</kbd> use</span><span><kbd>1</kbd>–<kbd>6</kbd> fast travel</span><span><kbd>Esc</kbd> pause</span></div>
+      <button class="btn" id="start-btn">Click to enter the campus</button>
+      <button class="btn ghost" id="menu-btn">Play in menu mode (no walking)</button>
+    </div>
+  </div>
   <div id="modal" class="hidden"><div id="modal-card"></div></div>
   <div id="toast"></div>
 

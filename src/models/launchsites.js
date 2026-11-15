@@ -179,7 +179,7 @@ export function createSLC41() {
   group.add(cyl(6, 6, 9, m.white, 0, 24).translateX(0)); group.children[group.children.length - 1].position.set(130, 4.5, -120);
   const water = cyl(12, 12, 22, std(0xd8d6cf, { roughness: 0.6 }), 0, 40); water.position.set(140, 11, 120); group.add(water);
   group.add(smallBuilding(-120, 95, 30, 9, 18), smallBuilding(-160, -90, 22, 7, 14), smallBuilding(95, -70, 14, 6, 10));
-  for (const [x, z] of [[-75, 0], [75, -20], [0, 80], [0, -80]]) group.add(floodPole(x, z, 22));
+  for (const [x, z] of [[-75, 0], [75, -20], [-34, 80], [34, -80]]) group.add(floodPole(x, z, 22));
 
   // roads
   const road = std(0x8c8578, { roughness: 1 });
@@ -272,7 +272,8 @@ export function createLC39A() {
 function collectBlinkers(group) { const out = []; group.traverse((o) => { if (o.userData?.blink) out.push(o); }); return out; }
 
 // ------------------------------------------------------------------------------------------- environment
-export function createEnvironment(scene) {
+export function createEnvironment(scene, opts = {}) {
+  const clear = opts.clear || ((x, z) => Math.hypot(x, z) < 210 || (Math.abs(z) < 25 && x < 0 && x > -640));
   const env = new THREE.Group(); env.name = 'Environment';
   // OSIRIS-REx launched 7:05 pm EDT: sun just above the western horizon (-X)
   const sunDir = V(-0.92, 0.07, 0.38).normalize();
@@ -348,7 +349,7 @@ export function createEnvironment(scene) {
   let n = 0;
   while (n < 2600) {
     const x = (Math.random() - 0.5) * 2800, z = (Math.random() - 0.5) * 2800;
-    if (Math.hypot(x, z) < 210 || x > 940 || (Math.abs(z) < 25 && x < 0 && x > -640) || (x < -1050 && x > -1950)) continue;
+    if (clear(x, z) || x > 940 || (x < -1050 && x > -1950)) continue;
     const sc = 2 + Math.random() * 5;
     p.set(x, sc * 0.4, z); s.set(sc * (1 + Math.random()), sc * (0.6 + Math.random() * 0.6), sc * (1 + Math.random()));
     q.setFromAxisAngle(V(0, 1, 0), Math.random() * 6.28);

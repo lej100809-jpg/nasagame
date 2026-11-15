@@ -34,7 +34,28 @@ function noise(dur, vol, lp = 400, attack = 0.5) {
   const g = a.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vol, t + attack); g.gain.linearRampToValueAtTime(vol * 0.7, t + dur * 0.7); g.gain.linearRampToValueAtTime(0, t + dur);
   src.connect(f); f.connect(g); g.connect(master); src.start(t);
 }
+function burst(dur, vol, freq, q = 1) {
+  if (!enabled || !unlocked) return;
+  const a = ac(), t = a.currentTime;
+  const len = Math.floor(a.sampleRate * dur);
+  const buf = a.createBuffer(1, len, a.sampleRate); const d = buf.getChannelData(0);
+  for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3);
+  const src = a.createBufferSource(); src.buffer = buf;
+  const f = a.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q;
+  const g = a.createGain(); g.gain.value = vol;
+  src.connect(f); f.connect(g); g.connect(master); src.start(t);
+}
 export const sfx = {
+  step: (surface = 'concrete', sprint = false) => {
+    const base = surface === 'metal' ? 2400 : surface === 'grass' ? 700 : 1300;
+    burst(sprint ? 0.09 : 0.07, sprint ? 0.5 : 0.32, base * (0.85 + Math.random() * 0.3), surface === 'metal' ? 4 : 1.2);
+    if (surface === 'metal') tone(180 + Math.random() * 40, 0.08, 'triangle', 0.025);
+  },
+  land: (k = 1) => { burst(0.16, 0.6 * k + 0.2, 400, 0.8); },
+  jump: () => burst(0.06, 0.2, 900, 1),
+  focus: () => tone(1760, 0.03, 'sine', 0.025),
+  open: () => { tone(520, 0.06, 'sine', 0.05); setTimeout(() => tone(1040, 0.08, 'sine', 0.05), 60); },
+
   click: () => tone(880, 0.06, 'square', 0.04),
   select: () => { tone(660, 0.07, 'sine', 0.08); setTimeout(() => tone(990, 0.09, 'sine', 0.07), 50); },
   error: () => tone(180, 0.25, 'sawtooth', 0.06, -60),
