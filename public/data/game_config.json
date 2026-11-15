@@ -1,0 +1,188 @@
+{
+  "about": "Values the game needs that are not in the NASA/paper-sourced JSON files. Every entry carries a status: verified (from the listed source), derived (computed from sourced data with a stated method), estimate (secondary source, unconfirmed), or game_defined (chosen for gameplay). All game_defined values are listed in README.md. Prepared with AI (Claude) assistance.",
+  "constants": {
+    "g0_m_s2": { "value": 9.80665, "status": "verified", "source": "standard gravity (CGPM 1901)" },
+    "mu_earth_km3_s2": { "value": 398600.4418, "status": "verified", "source": "IERS / JPL" },
+    "r_earth_km": { "value": 6378.137, "status": "verified", "source": "WGS-84 equatorial radius" },
+    "mu_sun_km3_s2": { "value": 132712440018, "status": "verified", "source": "JPL" },
+    "au_km": { "value": 149597870.7, "status": "verified", "source": "IAU 2012" },
+    "c_km_s": { "value": 299792.458, "status": "verified", "source": "SI definition" },
+    "parking_orbit_alt_km": { "value": 185, "status": "game_defined", "note": "typical low parking orbit before the upper stage escape burn" }
+  },
+  "budget_musd": {
+    "value": 1000,
+    "status": "derived",
+    "note": "Real OSIRIS-REx: about $800M mission (excluding launch) + $183.5M Atlas V 411 launch = $983.5M (real_mission.json). Rounded up to $1,000M so the real design fits with a thin margin."
+  },
+  "launch_vehicle_model": {
+    "method": "Payload capacity vs C3 is computed with the user-supplied equations: the upper stage must raise a payload from a circular parking orbit (v_circ = sqrt(mu/r), vis-viva with a = r) to the hyperbolic departure speed v = sqrt(C3 + v_esc^2), where v_esc = sqrt(2 mu / r) (escape velocity; vis-viva with a = -mu/C3). The required delta-v is then fed into the Tsiolkovsky rocket equation for the upper stage. The only free parameter (usable upper-stage propellant left in the parking orbit) is calibrated so each curve passes through one sourced data point.",
+    "vehicles": {
+      "atlas_v_411": {
+        "upper_stage": "Centaur (RL10, LH2/LOX)",
+        "isp_s": { "value": 450.5, "status": "verified", "source": "https://www.ulalaunch.com/rockets/atlas-v (RL10C-1)" },
+        "stage_dry_kg": { "value": 2316, "status": "estimate", "note": "approximate Centaur III single-engine dry mass" },
+        "calibration_point": { "c3_km2_s2": 29.3, "mass_kg": 2105, "status": "verified", "source": "https://arxiv.org/pdf/1702.06981" },
+        "propellants": [
+          { "stage": "Common Core Booster (RD-180)", "fuel": "RP-1 kerosene", "oxidizer": "liquid oxygen", "class": "liquid" },
+          { "stage": "1x AJ-60A solid rocket booster", "fuel": "HTPB binder + aluminium powder", "oxidizer": "ammonium perchlorate", "class": "solid" },
+          { "stage": "Centaur upper stage (RL10)", "fuel": "liquid hydrogen", "oxidizer": "liquid oxygen", "class": "liquid" }
+        ],
+        "site": "Space Launch Complex 41, Cape Canaveral"
+      },
+      "falcon_9": {
+        "upper_stage": "Falcon 9 second stage (Merlin Vacuum, RP-1/LOX)",
+        "isp_s": { "value": 348, "status": "estimate", "note": "Merlin 1D Vacuum, public SpaceX figure" },
+        "stage_dry_kg": { "value": 4000, "status": "estimate" },
+        "calibration_point": { "c3_km2_s2": 4.3, "mass_kg": 2840, "status": "estimate", "note": "NASA Launch Services Program data for Falcon 9 with drone-ship booster recovery (Mars, C3 4.3), as republished by Spaceflight101", "source": "https://spaceflight101.com/members/?p=343" },
+        "propellants": [
+          { "stage": "First stage (9x Merlin 1D)", "fuel": "RP-1 kerosene", "oxidizer": "liquid oxygen", "class": "liquid" },
+          { "stage": "Second stage (Merlin Vacuum)", "fuel": "RP-1 kerosene", "oxidizer": "liquid oxygen", "class": "liquid" }
+        ],
+        "site": "Launch Complex 39A, Kennedy Space Center"
+      },
+      "falcon_heavy": {
+        "upper_stage": "Falcon Heavy second stage (Merlin Vacuum, RP-1/LOX)",
+        "isp_s": { "value": 348, "status": "estimate" },
+        "stage_dry_kg": { "value": 4000, "status": "estimate" },
+        "calibration_point": { "c3_km2_s2": 4.3, "mass_kg": 5160, "status": "estimate", "note": "NASA Launch Services Program data for Falcon Heavy with core recovery (Mars, C3 4.3), as republished by Spaceflight101", "source": "https://spaceflight101.com/members/?p=343" },
+        "propellants": [
+          { "stage": "Center core + 2 side boosters (27x Merlin 1D)", "fuel": "RP-1 kerosene", "oxidizer": "liquid oxygen", "class": "liquid" },
+          { "stage": "Second stage (Merlin Vacuum)", "fuel": "RP-1 kerosene", "oxidizer": "liquid oxygen", "class": "liquid" }
+        ],
+        "site": "Launch Complex 39A, Kennedy Space Center"
+      }
+    }
+  },
+  "bus": {
+    "mass_kg": { "value": 622, "status": "derived", "note": "Chosen so the real OSIRIS-REx configuration (all instruments, large array, HGA, shield level 2) gives the real 880 kg dry mass (parts.json reference_spacecraft)." },
+    "cost_musd": { "value": 490, "status": "game_defined", "note": "Bus + operations so the real configuration costs about $800M (real_mission.json)." },
+    "power_w": { "value": 800, "status": "game_defined", "note": "Housekeeping load: avionics, heaters, reaction wheels." }
+  },
+  "instrument_extras": {
+    "ocams": { "mass_kg": 1.8, "power_w_avg": 15.9, "status": "estimate", "note": "3 cameras x 0.6 kg and 5.3 W from a secondary site (parts.json note), unconfirmed." },
+    "tagsam": { "mass_kg": 40, "power_w_avg": 20, "status": "game_defined", "note": "No sourced mass or power found (parts.json needs_source)." },
+    "src": { "power_w_avg": 0, "status": "verified", "note": "Capsule is unpowered until release (parts.json)." }
+  },
+  "instrument_game": {
+    "ocams": { "cost_musd": 45, "data_gb_day": 0.80 },
+    "ola": { "cost_musd": 35, "data_gb_day": 0.40 },
+    "ovirs": { "cost_musd": 40, "data_gb_day": 0.20 },
+    "otes": { "cost_musd": 25, "data_gb_day": 0.12 },
+    "rexis": { "cost_musd": 5, "data_gb_day": 0.04 },
+    "tagsam": { "cost_musd": 60, "data_gb_day": 0 },
+    "src": { "cost_musd": 40, "data_gb_day": 0 },
+    "status": "game_defined"
+  },
+  "solar_cost_musd": { "solar_small": 15, "solar_medium": 25, "solar_large": 35, "status": "game_defined" },
+  "antenna_game": {
+    "hga": { "mass_kg": 30, "power_w": 60, "cost_musd": 15 },
+    "lga_only": { "mass_kg": 5, "power_w": 15, "cost_musd": 2 },
+    "status": "game_defined"
+  },
+  "shield_cost_musd": { "0": 0, "1": 6, "2": 12, "3": 22, "status": "game_defined" },
+  "downlink_hours_per_day": { "value": 10, "status": "game_defined" },
+  "propulsion_options": [
+    {
+      "id": "mono_n2h4",
+      "name": "Hydrazine monopropellant (as flown)",
+      "class": "liquid",
+      "fuel": "hydrazine (N2H4), decomposed on a catalyst bed",
+      "oxidizer": "none needed (monopropellant)",
+      "isp_s": 230,
+      "isp_status": "verified (parts.json propulsion, MR-107S)",
+      "max_burns": 99,
+      "throttle": true,
+      "extra_mass_kg": 0,
+      "extra_cost_musd": 0,
+      "pros": "Simple, restartable, precise. What OSIRIS-REx flew.",
+      "cons": "Lowest efficiency of the liquid options."
+    },
+    {
+      "id": "biprop_mmh_nto",
+      "name": "Bipropellant MMH / NTO",
+      "class": "liquid",
+      "fuel": "monomethylhydrazine (MMH)",
+      "oxidizer": "nitrogen tetroxide (N2O4)",
+      "isp_s": 315,
+      "isp_status": "game_defined (typical storable biprop)",
+      "max_burns": 99,
+      "throttle": true,
+      "extra_mass_kg": 45,
+      "extra_cost_musd": 30,
+      "pros": "Higher exhaust velocity: same delta-v with less propellant.",
+      "cons": "Heavier engines and plumbing, more expensive, more complex."
+    },
+    {
+      "id": "solid_kick",
+      "name": "Solid kick motor",
+      "class": "solid",
+      "fuel": "aluminium powder in HTPB binder",
+      "oxidizer": "ammonium perchlorate (pre-mixed)",
+      "isp_s": 290,
+      "isp_status": "game_defined (typical solid motor)",
+      "max_burns": 1,
+      "throttle": false,
+      "extra_mass_kg": 0,
+      "extra_cost_musd": -10,
+      "pros": "Simple, cheap, storable, ready instantly.",
+      "cons": "Once lit it burns to depletion: no throttle, no restart. A sample return needs several burns."
+    },
+    {
+      "id": "hybrid",
+      "name": "Hybrid motor",
+      "class": "hybrid",
+      "fuel": "solid HTPB grain",
+      "oxidizer": "liquid nitrous oxide injected",
+      "isp_s": 250,
+      "isp_status": "game_defined",
+      "max_burns": 3,
+      "throttle": true,
+      "extra_mass_kg": 30,
+      "extra_cost_musd": 10,
+      "pros": "Can be shut down by closing the oxidizer valve; safer than solids.",
+      "cons": "Limited restarts and still heavier than monoprop for the same job."
+    }
+  ],
+  "tank": { "max_propellant_kg": 1400, "status": "game_defined" },
+  "delta_v_budget_km_s": {
+    "proximity_ops": { "value": 0.10, "status": "game_defined", "note": "approach, orbit insertion, TAG rehearsals and back-away" },
+    "return_departure": { "value": 0.27, "status": "game_defined", "note": "set close to OSIRIS-REx's May 2021 Bennu departure burn" }
+  },
+  "timeline_days": {
+    "proximity_ops": { "value": 880, "status": "game_defined", "note": "real OSIRIS-REx stayed about 2.4 years (arrival 2018-12-03, departure May 2021)" },
+    "return_cruise": { "value": 870, "status": "game_defined", "note": "real OSIRIS-REx return took about 2.4 years (sample landed 2023-09-24)" }
+  },
+  "space_weather": {
+    "events_min": 3,
+    "events_max": 5,
+    "failure_prob_per_level": 0.18,
+    "safe_mode_prob_factor": 0.25,
+    "safe_mode_days": 45,
+    "extra_day_cost_musd": 0.25,
+    "status": "game_defined"
+  },
+  "sampling": {
+    "base_success": 0.68,
+    "bonus": { "ocams": 0.12, "ola": 0.10 },
+    "sample_mass_g_range": [60, 260],
+    "second_attempt_prop_margin_kg": 40,
+    "status": "game_defined"
+  },
+  "objectives": {
+    "sample": { "label": "Return at least 60 g of pristine carbon-rich regolith", "needs_all": ["tagsam", "src"], "primary": true },
+    "global": { "label": "Map Bennu's global properties", "needs_any": ["ocams", "ola"], "points": 250 },
+    "chem_map": { "label": "Map chemistry and mineralogy", "needs_any": ["ovirs", "otes", "rexis"], "points": 250 },
+    "yarkovsky": { "label": "Measure the Yarkovsky effect", "needs_any": ["otes"], "points": 250 },
+    "site": { "label": "Document the regolith at the sample site", "needs_any": ["ocams", "ola"], "points": 250 },
+    "status": "game_defined mapping (parts.json objectives)"
+  },
+  "score": {
+    "primary_success": 1000,
+    "secondary_selected_success": 250,
+    "secondary_selected_failed": -100,
+    "budget_bonus_per_musd_left": 3,
+    "budget_bonus_cap": 300,
+    "sample_mass_bonus_per_g_over_60": 2,
+    "status": "game_defined"
+  }
+}

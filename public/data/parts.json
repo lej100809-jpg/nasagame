@@ -1,0 +1,197 @@
+{
+  "notes": [
+    "status: verified = number taken from the listed source; needs_source = no reliable number found yet, fill before final build; game_defined = value chosen for gameplay, not from a source (list these in README).",
+    "objectives keys: sample = primary sample return, global = global properties, chem_map = chemistry and mineralogy map, yarkovsky = Yarkovsky effect, site = sampling site regolith documentation. Mapping of instruments to objectives is simplified for the game.",
+    "Data in this file was collected and organized with AI (Claude) and should be marked as AI-assisted in the README."
+  ],
+  "instruments": [
+    {
+      "id": "ocams",
+      "name": "OCAMS camera suite (PolyCam, MapCam, SamCam)",
+      "required": false,
+      "mass_kg": null,
+      "power_w_avg": null,
+      "objectives": [
+        "global",
+        "site"
+      ],
+      "status": "needs_source",
+      "note": "Official mass and power not found. A secondary site (spaceflight101) says each camera is 0.6 kg and 5.3 W, but this could not be confirmed.",
+      "source": "https://arxiv.org/pdf/1704.04531"
+    },
+    {
+      "id": "ola",
+      "name": "OLA laser altimeter",
+      "required": false,
+      "mass_kg": 21.4,
+      "power_w_avg": 59,
+      "power_w_standby": 43,
+      "objectives": [
+        "global",
+        "site"
+      ],
+      "status": "verified",
+      "note": "Mass = electronics 7.6 kg + optical head 13.8 kg (Table 3). Power 59 W nominal, 43 W standby.",
+      "source": "https://sbnarchive.psi.edu/pds4/orex/orex.ola_v4.0/document/ola_inst_paper.pdf"
+    },
+    {
+      "id": "ovirs",
+      "name": "OVIRS visible and infrared spectrometer",
+      "required": false,
+      "mass_kg": 17.8,
+      "power_w_avg": 8.8,
+      "power_w_peak": 13.5,
+      "objectives": [
+        "chem_map"
+      ],
+      "status": "verified",
+      "note": "Abstract says 17.8 kg, Table 2 says 17.7 kg.",
+      "source": "https://arxiv.org/pdf/1703.10574"
+    },
+    {
+      "id": "otes",
+      "name": "OTES thermal emission spectrometer",
+      "required": false,
+      "mass_kg": 6.27,
+      "power_w_avg": 10.8,
+      "power_w_peak": 15.99,
+      "objectives": [
+        "chem_map",
+        "yarkovsky"
+      ],
+      "status": "verified",
+      "note": "Linking OTES to the Yarkovsky objective (thermal data) is a game simplification.",
+      "source": "https://arxiv.org/pdf/1704.02390"
+    },
+    {
+      "id": "rexis",
+      "name": "REXIS X-ray imaging spectrometer (student-built)",
+      "required": false,
+      "mass_kg": 4.4,
+      "power_w_avg": 10.8,
+      "objectives": [
+        "chem_map"
+      ],
+      "status": "verified",
+      "note": "4.4 kg and 10.8 W are pre-flight current best estimates (CBE). eoPortal gives 2.7 kg. The NASA press kit says REXIS was a student collaboration with MIT and Harvard.",
+      "source": "https://arxiv.org/pdf/1309.6665"
+    },
+    {
+      "id": "tagsam",
+      "name": "TAGSAM sampling arm",
+      "required": true,
+      "mass_kg": null,
+      "power_w_avg": null,
+      "objectives": [
+        "sample"
+      ],
+      "status": "needs_source",
+      "note": "Arm length 3.35 m (NASA press kit). Mass and power not found.",
+      "source": "https://www.nasa.gov/wp-content/uploads/2016/06/osiris-rex_press_kit_0.pdf"
+    },
+    {
+      "id": "src",
+      "name": "Sample Return Capsule",
+      "required": true,
+      "mass_kg": 46,
+      "power_w_avg": null,
+      "objectives": [
+        "sample"
+      ],
+      "status": "verified",
+      "note": "46 kg in both the NASA press kit and Lauretta et al. 2017.",
+      "source": "https://www.nasa.gov/wp-content/uploads/2016/06/osiris-rex_press_kit_0.pdf"
+    }
+  ],
+  "solar_arrays": [
+    {
+      "id": "solar_small",
+      "name": "Small solar array",
+      "power_w_at_1au": 1000,
+      "mass_kg": 20,
+      "status": "game_defined"
+    },
+    {
+      "id": "solar_medium",
+      "name": "Medium solar array",
+      "power_w_at_1au": 2000,
+      "mass_kg": 40,
+      "status": "game_defined"
+    },
+    {
+      "id": "solar_large",
+      "name": "Large solar array",
+      "power_w_at_1au": 3000,
+      "mass_kg": 60,
+      "status": "game_defined",
+      "note": "Real reference: OSIRIS-REx arrays gave 1,226 to 3,000 W depending on Sun distance (NASA press kit). Lauretta et al. 2017 says 1,226 to 2,500 W."
+    }
+  ],
+  "antennas": [
+    {
+      "id": "hga",
+      "name": "High-gain antenna",
+      "downlink_kbps_at_bennu": 412,
+      "status": "verified",
+      "note": "412 kbit/s downlink from Bennu distance during the April 2021 flyby (eoPortal). OSIRIS-REx used a MAVEN build-to-print HGA.",
+      "source": "https://www.eoportal.org/satellite-missions/osiris-rex"
+    },
+    {
+      "id": "lga_only",
+      "name": "Low-gain antenna only",
+      "downlink_kbps_at_bennu": 40,
+      "status": "game_defined",
+      "note": "10 percent of the HGA value, chosen for gameplay."
+    }
+  ],
+  "shielding": [
+    {
+      "id": "shield_0",
+      "level": 0,
+      "mass_kg": 0,
+      "status": "game_defined"
+    },
+    {
+      "id": "shield_1",
+      "level": 1,
+      "mass_kg": 15,
+      "status": "game_defined"
+    },
+    {
+      "id": "shield_2",
+      "level": 2,
+      "mass_kg": 30,
+      "status": "game_defined"
+    },
+    {
+      "id": "shield_3",
+      "level": 3,
+      "mass_kg": 50,
+      "status": "game_defined"
+    }
+  ],
+  "propulsion": {
+    "type": "hydrazine monopropellant",
+    "isp_s": 230,
+    "isp_range_s": [
+      225,
+      236
+    ],
+    "status": "verified",
+    "note": "OSIRIS-REx main thrusters were four MR-107S (eoPortal). Manufacturer spec sheet gives MR-107S Isp 225 to 236 s; 230 s is the middle value used in the game.",
+    "sources": [
+      "https://www.eoportal.org/satellite-missions/osiris-rex",
+      "https://www.l3harris.com/sites/default/files/2023-07/AJRD-LHX_Monopropellant_Rocket_Engines_SpecSheet_CMYK_061423_APPROVED.pdf"
+    ]
+  },
+  "reference_spacecraft": {
+    "dry_mass_kg": 880,
+    "launch_mass_kg": 2110,
+    "launch_mass_kg_paper": 2105,
+    "note": "Use dry mass 880 kg to tune the bus mass so the real OSIRIS-REx setup matches. 2,110 kg from NASA press kit, 2,105 kg from Lauretta et al. 2017.",
+    "sources": [
+      "https://www.nasa.gov/wp-content/uploads/2016/06/osiris-rex_press_kit_0.pdf",
+      "https://arxiv.org/pdf/1702.06981"
+    ]
+  }
+}
