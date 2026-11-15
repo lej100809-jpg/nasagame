@@ -1,6 +1,8 @@
-# Miku☆Miku☆Beam — Bennu Sample Return Mission Designer
+<img src="public/logo.svg" alt="COSMO CRAFT" width="420">
 
-**NASA Space Apps Challenge 2026 · Mission design game**
+# COSMO CRAFT — Bennu Sample Return Mission Designer
+
+**NASA Space Apps Challenge 2026 · Team Miku☆Miku☆Beam · Mission design game**
 
 ▶ **Play (no install, no login):** https://lej100809-jpg.github.io/nasagame/
 

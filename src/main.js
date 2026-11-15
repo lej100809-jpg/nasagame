@@ -1,4 +1,4 @@
-// Miku☆Miku☆Beam — main game controller.
+// COSMO CRAFT (team Miku☆Miku☆Beam) — main game controller.
 // First-person campus exploration + console "terminals" + mission operations + report.
 // Code written with AI assistance (Claude, Anthropic) for NASA Space Apps Challenge 2026.
 import './ui/style.css';
@@ -591,7 +591,7 @@ function drawWall() {
   g.fillStyle = '#030b14'; g.fillRect(0, 0, W, H);
   g.strokeStyle = 'rgba(57,197,187,.25)'; g.lineWidth = 1;
   for (let x = 0; x < W; x += 32) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
-  g.fillStyle = '#39c5bb'; g.font = 'bold 30px Orbitron, sans-serif'; g.fillText('MIKU☆MIKU☆BEAM · BENNU SAMPLE RETURN', 30, 52);
+  g.fillStyle = '#39c5bb'; g.font = 'bold 30px Orbitron, sans-serif'; g.fillText('COSMO CRAFT · BENNU SAMPLE RETURN', 30, 52);
   g.font = '22px JetBrains Mono, monospace'; g.fillStyle = '#e6eef5';
   const o = C.opt;
   const lines = [
@@ -694,6 +694,7 @@ function showBoard(id) {
 
 function setupCampus(CampusScene) {
   campus = new CampusScene({ vehicleId: S.vehicleId });
+  campus.setRenderer?.(renderer);
   campus.camera.near = 0.05; campus.camera.updateProjectionMatrix();
   campus.scene.add(campus.camera);
   fp = new FPController(campus.camera, canvas, { colliders: campus.colliders, bounds: campus.bounds, interactables: campus.interactables });

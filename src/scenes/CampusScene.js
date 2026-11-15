@@ -108,7 +108,7 @@ export class CampusScene {
     g.fillStyle = '#6fb6ff'; g.beginPath(); g.arc(850, 270, 7, 0, 7); g.fill();
     g.fillStyle = '#ffb27a'; g.beginPath(); g.arc(560, 180, 6, 0, 7); g.fill();
     g.fillStyle = '#4fd1ff'; g.font = '700 26px "Segoe UI", Arial'; g.fillText('MISSION CONTROL · BENNU SAMPLE RETURN', 40, 60);
-    g.fillStyle = '#ffffff'; g.font = '800 54px "Segoe UI", Arial'; g.fillText('MIKU☆MIKU☆BEAM', 40, 130);
+    g.fillStyle = '#ffffff'; g.font = '800 54px "Segoe UI", Arial'; g.fillText('COSMO CRAFT', 40, 130);
     g.fillStyle = '#9fd8ff'; g.font = '400 24px "Segoe UI", Arial';
     ['Target: 101955 Bennu', 'Status: awaiting mission briefing', 'Walk to the holo table to begin'].forEach((t, i) => g.fillText(t, 40, 200 + i * 38));
     this.screenTexture.needsUpdate = true;
@@ -178,18 +178,18 @@ export class CampusScene {
     // glowing plaza inlay: orbit rings + guide lines toward Mission Control and the avenue
     {
       const inlay = canvasTexture(1024, 1024, (g, W, H) => {
-        g.clearRect(0, 0, W, H); g.strokeStyle = 'rgba(80,220,255,1)'; g.lineWidth = 6;
+        g.clearRect(0, 0, W, H); g.strokeStyle = 'rgba(80,220,255,1)'; g.lineWidth = 16;
         g.beginPath(); g.arc(W / 2, H / 2, W * 0.46, 0, 7); g.stroke();
-        g.lineWidth = 3; g.beginPath(); g.ellipse(W / 2 + 18, H / 2, W * 0.36, W * 0.3, 0.4, 0, 7); g.stroke();
+        g.lineWidth = 10; g.beginPath(); g.ellipse(W / 2 + 18, H / 2, W * 0.36, W * 0.3, 0.4, 0, 7); g.stroke();
         g.beginPath(); g.arc(W / 2, H / 2, W * 0.2, 0, 7); g.stroke();
         for (let i = 0; i < 72; i++) { const a = (i / 72) * Math.PI * 2, r1 = W * 0.43, r2 = i % 6 ? W * 0.445 : W * 0.41; g.beginPath(); g.moveTo(W / 2 + Math.cos(a) * r1, H / 2 + Math.sin(a) * r1); g.lineTo(W / 2 + Math.cos(a) * r2, H / 2 + Math.sin(a) * r2); g.stroke(); }
-        g.fillStyle = 'rgba(80,220,255,1)'; g.font = '800 64px "Segoe UI", Arial'; g.textAlign = 'center'; g.fillText('MIKU☆MIKU☆BEAM', W / 2, H / 2 + 22);
+        g.fillStyle = 'rgba(80,220,255,1)'; g.font = '800 64px "Segoe UI", Arial'; g.textAlign = 'center'; g.fillText('COSMO CRAFT', W / 2, H / 2 + 22);
       });
       const disc = new THREE.Mesh(new THREE.PlaneGeometry(12, 12), new THREE.MeshBasicMaterial({ map: inlay, transparent: true, opacity: 0.85, depthWrite: false, color: new THREE.Color(1.4, 1.4, 1.4), toneMapped: false }));
       disc.rotation.x = -Math.PI / 2; disc.position.set(2, 0.05, 12); this.scene.add(disc);
       const led = new THREE.MeshBasicMaterial({ color: new THREE.Color(0.3, 1.5, 2.1), toneMapped: false });
       const lines = [[V(-2, 0.05, 7), V(-18, 0.05, -11)], [V(4.5, 0.05, 6.4), V(4, 0.05, -8)], [V(7, 0.05, 8), V(29, 0.05, -9)]];
-      const lm = beams(lines, 0.12, led); lm.castShadow = false; lm.scale.y = 1; this.scene.add(lm);
+      const lm = beams(lines, 0.22, led); lm.castShadow = false; lm.scale.y = 1; this.scene.add(lm);
     }
     // wayfinding sign
     const signPost = this._box(0.25, 3.2, 0.25, std(0x2b2f36), 12, 0, 4, { col: true });
@@ -199,7 +199,7 @@ export class CampusScene {
     signPost.userData.sign = true;
     // campus title monolith
     const mono = this._box(9, 2.2, 0.8, std(0x1a2230, { roughness: 0.6 }), -8, 0, 40, { col: true });
-    const title = signMesh('MIKU☆MIKU☆BEAM SPACE CENTER', 8.6, 1.4, { glow: 1.3, sub: 'Bennu Sample Return · Mission Campus' });
+    const title = signMesh('COSMO CRAFT SPACE CENTER', 8.6, 1.4, { glow: 1.3, sub: 'Bennu Sample Return · Mission Campus' });
     title.position.set(-8, 1.15, 39.55); title.rotation.y = Math.PI; this.scene.add(title);
     const title2 = title.clone(); title2.position.set(-8, 1.15, 40.45); title2.rotation.y = 0; this.scene.add(title2);
     mono.userData.sign = true;
@@ -761,7 +761,7 @@ export class CampusScene {
       cone.renderOrder = 7; g.add(cone);
     }
     // extra spotlights (the env already has two)
-    const sp = new THREE.SpotLight(0xe6eeff, 14000, 300, 0.16, 0.6, 1.6);
+    const sp = new THREE.SpotLight(0xe6eeff, this.vehicleId === 'atlas_v_411' ? 14000 : 4000, 300, 0.16, 0.6, 1.6);
     sp.position.set(off.x - 80, 30, off.z - 60); sp.target.position.set(off.x, top.y + H * 0.5, off.z); g.add(sp, sp.target);
     // boil-off steam particles venting from the vehicle
     const N = 90;
@@ -821,7 +821,8 @@ export class CampusScene {
     const [f1, f2] = this.env.flood; const H = this.rocket.userData.height;
     f1.position.set(off.x + 70, this.padWorld.y + 2, off.z + 90); f2.position.set(off.x - 60, this.padWorld.y + 2, off.z + 95);
     f1.target.position.set(off.x, this.padWorld.y + H * 0.55, off.z); f2.target.position.set(off.x, this.padWorld.y + H * 0.45, off.z);
-    f1.distance = f2.distance = 360; f1.intensity = 16000; f2.intensity = 11000; f1.angle = f2.angle = 0.16;
+    const k = atlas ? 1 : 0.3; // white Falcon paint needs far less light than the bronze Atlas core
+    f1.distance = f2.distance = 360; f1.intensity = 16000 * k; f2.intensity = 11000 * k; f1.angle = f2.angle = 0.16;
     this._buildPadFx(off, H);
     // gate sign
     const txt = atlas ? 'SPACE LAUNCH COMPLEX 41' : 'LAUNCH COMPLEX 39A';

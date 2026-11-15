@@ -1,4 +1,6 @@
-# 인수인계 보고서 — Miku☆Miku☆Beam (NASA Space Apps 2026)
+# 인수인계 보고서 — COSMO CRAFT (팀 Miku☆Miku☆Beam, NASA Space Apps 2026)
+
+게임 이름은 21:04에 사용자 요청으로 COSMO CRAFT로 변경됨. 로고: public/logo.svg, 파비콘: public/favicon.svg, 상단바·로딩·시작 카드에 인라인 SVG 엠블럼(베누 + 궤도 링 + 핑크 별).
 
 작성: Claude (2026-11-15 21:05 KST 기준). 다음 작업자(사람 또는 다른 AI)가 이 문서만 보고 바로 이어서 작업할 수 있게 처음부터 끝까지 적음.
 
