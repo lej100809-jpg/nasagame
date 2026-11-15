@@ -1,6 +1,6 @@
-<img src="public/logo.svg" alt="COSMO CRAFT" width="420">
+<img src="public/logo.png" alt="COSMO CRAFT — Design Your Own Asteroid Mission" width="460">
 
-# COSMO CRAFT — Bennu Sample Return Mission Designer
+# COSMO CRAFT — Design Your Own Asteroid Mission
 
 **NASA Space Apps Challenge 2026 · Team Miku☆Miku☆Beam · Mission design game**
 

@@ -1,3 +1,4 @@
+@import '@fontsource/syncopate/700.css';
 @import '@fontsource/space-grotesk/400.css';
 @import '@fontsource/space-grotesk/500.css';
 @import '@fontsource/space-grotesk/700.css';
@@ -323,17 +324,17 @@ details.src summary { cursor: pointer; color: var(--mute); font-family: var(--mo
 .gauges { top: -22px; }
 #panel .alert { font-size: 12px; }
 
-/* ---------- COSMO CRAFT brand ---------- */
-.brand { display: flex; align-items: center; gap: 10px; }
-.brand .emblem { width: 32px; height: 32px; flex: none; filter: drop-shadow(0 0 8px rgba(57,197,187,.35)); }
-.brand .wm { display: flex; flex-direction: column; line-height: .92; }
-.brand .wm b { font-family: 'Orbitron'; font-weight: 900; font-size: 16px; letter-spacing: .08em; color: #fff; }
-.brand .wm i { font-family: 'Orbitron'; font-style: normal; font-weight: 700; font-size: 9.5px; letter-spacing: .62em; color: var(--miku); margin-top: 3px; }
-.brand .wm small { font-family: var(--mono); font-size: 10px; letter-spacing: .32em; color: var(--dim); margin-top: 10px; }
-.brand.big .emblem, .brand.hero .emblem { width: 92px; height: 92px; }
-.brand.big .wm b, .brand.hero .wm b { font-size: clamp(40px, 6vw, 68px); }
-.brand.big .wm i, .brand.hero .wm i { font-size: clamp(17px, 2.4vw, 26px); letter-spacing: .78em; margin-top: 8px; }
-.brand.hero { justify-content: center; gap: 18px; text-align: left; margin-bottom: 4px; }
-.brand.big { gap: 18px; }
-.start-sub { margin-top: 14px !important; }
+
+/* ---------- COSMO CRAFT brand (benchmark: Artemis / Starfield / NASA mission patches) ---------- */
+.brand { display: flex; align-items: center; gap: 11px; }
+.brand .emblem { width: 30px; height: 30px; flex: none; }
+.brand .wm { display: flex; flex-direction: column; align-items: flex-start; }
+.brand .wm b { font-family: 'Syncopate', sans-serif; font-weight: 700; font-size: 13px; letter-spacing: .24em; color: #fff; white-space: nowrap; }
+.brand.big, .brand.hero { flex-direction: column; gap: 22px; }
+.brand.big .emblem, .brand.hero .emblem { width: 96px; height: 96px; filter: drop-shadow(0 8px 30px rgba(57,197,187,.25)); }
+.brand.big .wm, .brand.hero .wm { align-items: center; }
+.brand.big .wm b, .brand.hero .wm b { font-size: clamp(30px, 4.4vw, 50px); letter-spacing: .2em; margin-right: -.2em; line-height: 1; }
+.brand .swoosh { display: block; width: 104%; height: 18px; margin: 10px -2% 0; }
+.brand .wm small { font-family: var(--mono); font-size: 11.5px; letter-spacing: .38em; color: var(--dim); margin-top: 14px; margin-right: -.38em; }
 .start-sub { display: none; }
+.start-card { padding-top: 40px; }

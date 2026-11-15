@@ -591,7 +591,7 @@ function drawWall() {
   g.fillStyle = '#030b14'; g.fillRect(0, 0, W, H);
   g.strokeStyle = 'rgba(57,197,187,.25)'; g.lineWidth = 1;
   for (let x = 0; x < W; x += 32) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x, H); g.stroke(); }
-  g.fillStyle = '#39c5bb'; g.font = 'bold 30px Orbitron, sans-serif'; g.fillText('COSMO CRAFT · BENNU SAMPLE RETURN', 30, 52);
+  g.fillStyle = '#39c5bb'; g.font = 'bold 30px Orbitron, sans-serif'; g.fillText('COSMO CRAFT · DESIGN YOUR OWN ASTEROID MISSION', 30, 52);
   g.font = '22px JetBrains Mono, monospace'; g.fillStyle = '#e6eef5';
   const o = C.opt;
   const lines = [
